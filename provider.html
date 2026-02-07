@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Unio | Provider Management Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2563eb",
+            "background-light": "#f8fafc",
+            "background-dark": "#0f172a",
+            "card-light": "#ffffff",
+            "card-dark": "#1e293b",
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+            "xl": "1.5rem",
+          },
+        },
+      },
+    };
+  </script>
+  <script src="js/theme.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chart-bar {
+      transition: height 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+  <nav
+    class="sticky top-0 z-50 bg-card-light/80 dark:bg-card-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <!-- Logo Section -->
+      <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <div class="w-12 h-12 rounded-xl overflow-hidden">
+          <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+        </div>
+        <span class="text-2xl font-bold tracking-tight">UNIO</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-400">
+        <a class="hover:text-primary transition-colors" href="#">Services</a>
+        <a class="hover:text-primary transition-colors" href="#">About Us</a>
+        <a class="text-primary" href="#">Dashboard</a>
+      </div>
+
+      <!-- Right Side Controls -->
+      <div class="flex items-center gap-4">
+        <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          onclick="window.toggleTheme()">
+          <span class="material-icons dark:hidden">dark_mode</span>
+          <span class="material-icons hidden dark:inline">light_mode</span>
+        </button>
+        <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+          <div class="text-right hidden sm:block">
+            <p class="text-xs font-semibold">Alpha Logistics</p>
+            <p class="text-[10px] text-slate-500">Provider Account</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+            <span class="material-icons text-slate-500">business</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-7xl mx-auto p-6 md:p-8">
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Provider Dashboard</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-1">Manage your split resources and monitor earnings.</p>
+      </div>
+      <a href="postspace.html">
+        <button
+          class="bg-primary hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95">
+          <span class="material-icons text-sm">add</span>
+          Start Splitting
+        </button>
+      </a>
+
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div
+          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <div class="flex justify-between items-start mb-4">
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Amount Earned</p>
+            <span
+              class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2.5 py-1 rounded-full">+
+              12.5%</span>
+          </div>
+          <h2 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">$12,450.00</h2>
+          <p class="text-xs text-slate-400">vs. last month</p>
+        </div>
+        <div
+          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Live Asset Map</p>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white">Track Fleet</h2>
+            </div>
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+          </div>
+
+          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+          <div id="providerMap" class="h-32 bg-slate-100 dark:bg-slate-800 rounded-lg w-full z-0 relative"></div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', () => {
+              setTimeout(() => {
+                const map = L.map('providerMap', {
+                  zoomControl: false,
+                  attributionControl: false
+                }).setView([12.9716, 77.5946], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+                const truckIcon = L.divIcon({
+                  className: 'material-symbols-outlined text-primary text-xl',
+                  html: 'local_shipping',
+                  iconSize: [20, 20]
+                });
+
+                // Mock Assets
+                L.marker([12.9716, 77.5946], { icon: truckIcon }).addTo(map);
+                L.marker([13.0, 77.6], { icon: truckIcon }).addTo(map);
+              }, 1000);
+            });
+          </script>
+        </div>
+        <div
+          class="sm:col-span-2 bg-card-light dark:bg-card-dark rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="font-bold text-slate-900 dark:text-white">Active Postings</h3>
+            <div class="flex gap-2">
+              <span
+                class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full">Local</span>
+              <span class="text-slate-400 text-[10px] uppercase tracking-wider font-bold px-3 py-1">Global</span>
+            </div>
+          </div>
+          <div class="p-6 space-y-4">
+            <div
+              class="flex items-center justify-between p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                  <span class="material-icons text-blue-600 dark:text-blue-400">local_shipping</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 dark:text-white">Truck #882 - Split Space</h4>
+                  <p class="text-xs text-slate-500">Bangalore → Cochin • Jan 20th</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-green-600 dark:text-green-400">500kg Space Left</p>
+                <p class="text-xs text-slate-400">3 Bookings</p>
+              </div>
+            </div>
+            <div
+              class="flex items-center justify-between p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
+                  <span class="material-icons text-cyan-600 dark:text-cyan-400">ac_unit</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 dark:text-white">Cold Hub - Pallet Split</h4>
+                  <p class="text-xs text-slate-500">Ernakulam North • -18°C Frozen</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-green-600 dark:text-green-400">12 Pallets Available</p>
+                <p class="text-xs text-slate-400">5 Bookings</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-5 space-y-6">
+        <div
+          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white leading-none">Trending</h3>
+              <span class="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1 inline-block">● Live</span>
+            </div>
+            <span class="material-icons text-slate-400 cursor-pointer">more_horiz</span>
+          </div>
+          <div class="flex items-end justify-between h-40 gap-2 mb-8 px-2">
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 40%"></div>
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 60%"></div>
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 45%"></div>
+            <div class="chart-bar w-full bg-primary rounded-t-lg shadow-lg shadow-primary/30" style="height: 85%"></div>
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 70%"></div>
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 35%"></div>
+            <div class="chart-bar w-full bg-blue-100 dark:bg-blue-900/20 rounded-t-lg" style="height: 55%"></div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-slate-500 dark:text-slate-400">Shared Services</span>
+              <span class="font-bold text-slate-900 dark:text-white">+ $450</span>
+            </div>
+            <div class="h-px bg-slate-100 dark:bg-slate-800"></div>
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-slate-500 dark:text-slate-400">Digital Assets</span>
+              <span class="font-bold text-slate-900 dark:text-white">+ $1,200</span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <h3 class="font-bold text-slate-900 dark:text-white mb-6">List New Space</h3>
+          <form class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Resource Type</label>
+              <select
+                class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3">
+                <option>Truck Freight Space</option>
+                <option>Cold Storage Pallet</option>
+                <option>Warehouse Shared Space</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacity</label>
+                <input
+                  class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
+                  placeholder="e.g. 200kg" type="text" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price per
+                  Unit</label>
+                <input
+                  class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
+                  placeholder="$0.00" type="text" />
+              </div>
+            </div>
+            <button
+              class="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:opacity-90 transition-opacity"
+              type="button">
+              Publish Listing
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer
+    class="max-w-7xl mx-auto p-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
+    <p>© 2024 Unio Universal Splitting. All rights reserved.</p>
+    <div class="flex gap-6">
+      <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+      <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+      <a class="hover:text-primary transition-colors" href="#">Help Center</a>
+    </div>
+  </footer>
+
+</body>
+
+</html>

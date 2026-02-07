@@ -1,0 +1,56 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>UNIO | Login</title>
+  <link rel="stylesheet" href="lo.css" />
+  <script src="js/theme.js"></script>
+</head>
+
+<body>
+  <div class="auth-container">
+
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="overlay"></div>
+
+      <div class="left-content">
+        <h1>Edit Smarter.<br>Ship Faster.</h1>
+        <p>
+          Secure, passwordless access for modern logistics platforms.
+          Built for scale, speed, and simplicity.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+      <div class="login-card">
+        <h2 id="form-title">Welcome Back</h2>
+        <p class="subtitle">Sign in to continue</p>
+
+        <div id="auth-form">
+          <input type="text" id="name" placeholder="Full Name" style="display: none;" />
+          <input type="email" id="email" placeholder="Enter your email" />
+          <input type="password" id="password" placeholder="Enter your password"
+            style="margin-top: 10px; width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;" />
+
+          <button onclick="handleAuth()" id="auth-btn" style="margin-top: 20px;">
+            Login
+          </button>
+        </div>
+
+        <p id="status" style="margin-top: 10px; color: red;"></p>
+
+        <p class="footer-text" style="cursor: pointer; color: #2563eb;" onclick="toggleAuthMode()">
+          <span id="toggle-text">New here? Create an account</span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="log.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,217 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #0f172a;
+}
+
+/* MAIN LAYOUT */
+.auth-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL */
+.auth-left {
+  flex: 1.2;
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    #020617,
+    #020617,
+    #0f172a
+  );
+  display: flex;
+  align-items: center;
+  padding: 80px;
+  color: white;
+  overflow: hidden;
+}
+
+.auth-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("https://images.unsplash.com/photo-1521791055366-0d553872125f")
+    center / cover no-repeat;
+  opacity: 0.15;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(2, 6, 23, 0.95),
+    rgba(15, 23, 42, 0.85)
+  );
+}
+
+.left-content {
+  position: relative;
+  max-width: 500px;
+}
+
+.left-content h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.left-content p {
+  font-size: 18px;
+  color: #cbd5f5;
+  line-height: 1.6;
+}
+
+/* RIGHT PANEL */
+.auth-right {
+  flex: 1;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LOGIN CARD */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 40px rgba(15, 23, 42, 0.15);
+}
+
+.login-card h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 32px;
+  font-size: 15px;
+}
+
+/* INPUT */
+.login-card input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  outline: none;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+}
+
+.login-card input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* BUTTON */
+.login-card button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.login-card button:hover {
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+.login-card button:active {
+  transform: scale(0.97);
+}
+
+/* STATUS TEXT */
+#status {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #16a34a;
+}
+
+/* FOOTER TEXT */
+.footer-text {
+  margin-top: 30px;
+  font-size: 13px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-left {
+    padding: 60px 30px;
+  }
+
+  .left-content h1 {
+    font-size: 36px;
+  }
+
+  .login-card {
+    margin: 30px;
+  }
+}
+
+/* DARK MODE OVERRIDES */
+html.dark body {
+  background: #0f172a;
+}
+html.dark .auth-right {
+  background: #0f172a;
+}
+html.dark .login-card {
+  background: #1e293b;
+  color: white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+html.dark .login-card h2 {
+  color: white;
+}
+html.dark .subtitle {
+  color: #94a3b8;
+}
+html.dark .login-card input {
+  background: #0f172a;
+  border-color: #334155;
+  color: white;
+}
+html.dark .login-card input::placeholder {
+  color: #64748b;
+}
+html.dark .login-card input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+html.dark #status {
+  color: #4ade80; /* lighter green */
+}
+html.dark .footer-text {
+  color: #94a3b8;
+}

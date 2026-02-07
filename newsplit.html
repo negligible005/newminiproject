@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Unio | Create Digital Split</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        secondary: "#1E293B",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        "xl": "1.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-active {
+            @apply text-primary font-bold border-primary;
+        }
+        .step-inactive {
+            @apply text-slate-400 border-transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <nav
+        class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="text-2xl font-bold tracking-tight">UNIO</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Marketplace</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                    <span class="material-symbols-outlined text-xl">dark_mode</span>
+                </button>
+                <div
+                    class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-800">
+                    <img alt="User"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOW5pMVYap1HWYZosi2hukDXpWUKJhxCEqtI_LWunF-U7JvMfcSbzqmQxlZAuS0WeKG-ua3IhcwGVxAayIL-lzfZH-iURAe4NKqzj6KAG8jrPHHw6TWqUQ7fSI5-jyWmCIUDAPDtdvdyCvzVejgLXdkg5Jk2v6wTTsuoz8yBHWmUHnizZDPSqXWP8yN9_T4-dM2HpbNFm-gJHE_6rRZb9umrhN9ONy6LcmCLoklHAJ1YiZZo6wch1MJwQSHhhQ9Z-ofMBYhE8QySZU" />
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-[1440px] mx-auto px-6 py-8">
+        <div class="mb-8">
+            <a class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-4 text-sm font-medium"
+                href="#">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                Back to Marketplace
+            </a>
+            <h1 class="text-3xl font-bold">Create New Split Listing</h1>
+            <p class="text-slate-500 dark:text-slate-400">Share your digital subscription and split the costs with
+                others.</p>
+        </div>
+        <div class="flex flex-col lg:flex-row gap-12">
+            <div class="flex-1">
+                <div class="flex items-center gap-4 mb-10 overflow-x-auto pb-4">
+                    <div class="flex items-center gap-2 px-4 py-2 border-b-2 step-active whitespace-nowrap">
+                        <span
+                            class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">1</span>
+                        <span>Service Selection</span>
+                    </div>
+                    <div class="w-8 h-px bg-slate-200 dark:bg-slate-700"></div>
+                    <div class="flex items-center gap-2 px-4 py-2 border-b-2 step-inactive whitespace-nowrap">
+                        <span
+                            class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 flex items-center justify-center text-xs">2</span>
+                        <span>Pricing &amp; Slots</span>
+                    </div>
+                    <div class="w-8 h-px bg-slate-200 dark:bg-slate-700"></div>
+                    <div class="flex items-center gap-2 px-4 py-2 border-b-2 step-inactive whitespace-nowrap">
+                        <span
+                            class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 flex items-center justify-center text-xs">3</span>
+                        <span>Privacy &amp; Terms</span>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div
+                        class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 card-shadow">
+                        <h3 class="text-xl font-bold mb-6">Step 1: Select Service</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                            <label class="relative group cursor-pointer">
+                                <input checked="" class="peer sr-only" name="service" type="radio" />
+                                <div
+                                    class="p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 peer-checked:border-primary peer-checked:bg-blue-50/50 dark:peer-checked:bg-blue-900/10 transition-all flex flex-col items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white">
+                                        <span class="material-symbols-outlined text-2xl">menu_book</span>
+                                    </div>
+                                    <span class="font-bold text-sm">Learning</span>
+                                </div>
+                            </label>
+                            <label class="relative group cursor-pointer">
+                                <input class="peer sr-only" name="service" type="radio" />
+                                <div
+                                    class="p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 peer-checked:border-primary peer-checked:bg-blue-50/50 dark:peer-checked:bg-blue-900/10 transition-all flex flex-col items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center text-white">
+                                        <span class="material-symbols-outlined text-2xl">terminal</span>
+                                    </div>
+                                    <span class="font-bold text-sm">Software</span>
+                                </div>
+                            </label>
+                            <label class="relative group cursor-pointer">
+                                <input class="peer sr-only" name="service" type="radio" />
+                                <div
+                                    class="p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 peer-checked:border-primary peer-checked:bg-blue-50/50 dark:peer-checked:bg-blue-900/10 transition-all flex flex-col items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white">
+                                        <span class="material-symbols-outlined text-2xl">sports_esports</span>
+                                    </div>
+                                    <span class="font-bold text-sm">Gaming</span>
+                                </div>
+                            </label>
+                            <div
+                                class="p-4 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-primary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors group">
+                                <span
+                                    class="material-symbols-outlined text-slate-400 group-hover:text-primary">add</span>
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-primary">Other</span>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <label class="block text-sm font-semibold mb-2">Service Name</label>
+                            <input
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary"
+                                placeholder="e.g., CodeAcademy Pro" type="text" />
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 card-shadow">
+                        <h3 class="text-xl font-bold mb-6">Step 2: Pricing &amp; Slots</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Number of Available Slots</label>
+                                <div class="flex items-center gap-4">
+                                    <button
+                                        class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700">-</button>
+                                    <span class="text-xl font-bold w-8 text-center">3</span>
+                                    <button
+                                        class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700">+</button>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Total slots in plan: 5 (including you)</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Cost per Person / Month</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">$</span>
+                                    <input
+                                        class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-4 py-3 focus:ring-primary focus:border-primary font-bold"
+                                        type="number" value="4.99" />
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Total subscription cost: $24.95</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 card-shadow">
+                        <h3 class="text-xl font-bold mb-6">Step 3: Group Privacy</h3>
+                        <div class="space-y-4">
+                            <label
+                                class="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                                <input checked="" class="mt-1 text-primary focus:ring-primary" name="privacy"
+                                    type="radio" />
+                                <div>
+                                    <p class="font-bold text-sm">Public Listing</p>
+                                    <p class="text-xs text-slate-500">Anyone in the Unio community can discover and join
+                                        your split.</p>
+                                </div>
+                            </label>
+                            <label
+                                class="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                                <input class="mt-1 text-primary focus:ring-primary" name="privacy" type="radio" />
+                                <div>
+                                    <p class="font-bold text-sm">Private Link</p>
+                                    <p class="text-xs text-slate-500">Only people with the direct link can see and
+                                        request to join.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-6">
+                        <button
+                            class="px-8 py-3 border border-slate-200 dark:border-slate-700 rounded-full font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Save
+                            Draft</button>
+                        <button
+                            class="px-12 py-3 bg-primary text-white rounded-full font-bold hover:shadow-lg hover:shadow-primary/20 transition-all">Publish
+                            Listing</button>
+                    </div>
+                </div>
+            </div>
+            <aside class="w-full lg:w-[400px]">
+                <div class="sticky top-28 space-y-6">
+                    <div
+                        class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Preview</h4>
+                            <span class="flex h-2 w-2 relative">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-white dark:border-slate-700 shadow-xl">
+                            <div class="flex items-start justify-between mb-6">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-12 h-12 bg-orange-500 flex items-center justify-center rounded-xl text-white">
+                                        <span class="material-symbols-outlined text-2xl">menu_book</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-lg">CodeAcademy Pro</h3>
+                                        <div class="flex items-center gap-1 text-xs text-slate-500">
+                                            <span class="material-symbols-outlined text-[14px]">verified</span>
+                                            <span>Alex's Group</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span
+                                    class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-lg text-[11px] font-bold">3
+                                    Slots Left</span>
+                            </div>
+                            <div class="space-y-4 mb-6">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">Subscription Tier</span>
+                                    <span class="font-semibold">Annual Pro Plan</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">Billing Cycle</span>
+                                    <span class="font-semibold">Monthly</span>
+                                </div>
+                                <div class="h-px bg-slate-100 dark:bg-slate-700"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-slate-400">You pay</p>
+                                    <p class="text-2xl font-black text-primary">$4.99<span
+                                            class="text-xs font-normal text-slate-500">/mo</span></p>
+                                </div>
+                                <button
+                                    class="bg-secondary dark:bg-slate-700 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-secondary/20">Join
+                                    Group</button>
+                            </div>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <div class="flex gap-3">
+                                <span class="material-symbols-outlined text-primary text-sm">info</span>
+                                <p class="text-[11px] text-slate-500">Preview updates automatically as you edit the form
+                                    on the left. This is how other users will see your split listing.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-2xl border border-blue-100 dark:border-blue-900/30">
+                        <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+                            Quick Tips
+                        </h4>
+                        <ul class="text-xs space-y-3 text-blue-800/70 dark:text-blue-400">
+                            <li class="flex items-start gap-2">
+                                <span class="w-1 h-1 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></span>
+                                Set a fair price to fill slots faster.
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-1 h-1 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></span>
+                                Clearly mention the subscription tier (e.g., Premium, Family).
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="w-1 h-1 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></span>
+                                Verify your identity to gain more trust from the community.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-12">
+        <div class="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <a href="index.html"
+                class="flex items-center gap-2 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                <div class="w-8 h-8 rounded-lg overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="font-bold text-sm tracking-tight">UNIO</span>
+            </a>
+            <p class="text-sm text-slate-500">© 2024 Unio Logistics &amp; Resources. Shared infrastructure for all.</p>
+            <div class="flex gap-6">
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">public</span></a>
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">mail</span></a>
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">share</span></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

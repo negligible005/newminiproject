@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Unio | Cargo Split Booking</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        secondary: "#1E293B",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        "xl": "1.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .map-bg {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .map-bg {
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <nav
+        class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="text-2xl font-bold tracking-tight">UNIO</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors text-primary"
+                    href="#">Marketplace</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                    <span class="material-symbols-outlined text-xl">dark_mode</span>
+                </button>
+                <div
+                    class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-800">
+                    <img alt="User"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDablyLFdRj979wJ6HjrlzoAnGZ_PCbpjZ-VsznQ9aBNcNRmPMHWcONHe-g19Tqb6VZA_WrFAIJG8sydfeJbAlo47LWKLQcE3Cj5P_-esyqo2w4kqYh_l0eOgj44WK-uag2FkVzq-q_zJ7himaFi72rglqmg8xTFr9ECe9W1u1ajRZqHwt9khDAhST39KJsFYjTjO-vvhO5wyLaX6-pQkKl9_t3rhtGm3ASOQZJ451eubD4UyCPkg3EyuPIP2FVnvpjLgAGD3VLna0f" />
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-[1440px] mx-auto px-6 py-8">
+        <div class="mb-8 flex items-center gap-4">
+            <button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div>
+                <nav class="flex text-xs font-medium text-slate-500 gap-2 mb-1">
+                    <span>Marketplace</span>
+                    <span>/</span>
+                    <span>Logistics</span>
+                    <span>/</span>
+                    <span class="text-primary">Cargo Split</span>
+                </nav>
+                <h1 class="text-3xl font-bold">Cargo Split Booking</h1>
+            </div>
+        </div>
+        <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-6">
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-8 card-shadow border border-white dark:border-slate-700">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">location_on</span>
+                        Route Details
+                    </h2>
+                    <div class="space-y-6">
+                        <div
+                            class="relative pb-6 border-l-2 border-dashed border-slate-200 dark:border-slate-700 ml-4 pl-8">
+                            <div
+                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white dark:bg-slate-800 border-2 border-primary">
+                            </div>
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Pickup Address</label>
+                            <input
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                placeholder="Enter collection point" type="text" />
+                        </div>
+                        <div class="relative ml-4 pl-8">
+                            <div
+                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-2 border-primary">
+                            </div>
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Delivery Address</label>
+                            <input
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                placeholder="Enter destination" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-8 card-shadow border border-white dark:border-slate-700">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">inventory_2</span>
+                        Cargo Specifications
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Estimated Weight (kg)</label>
+                            <input
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                placeholder="0.00" type="number" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Cargo Category</label>
+                            <select
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary">
+                                <option>General Freight</option>
+                                <option>Fragile Goods</option>
+                                <option>Perishables</option>
+                                <option>Machinery</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Dimensions (L × W × H
+                                cm)</label>
+                            <div class="grid grid-cols-3 gap-4">
+                                <input
+                                    class="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                    placeholder="Length" type="number" />
+                                <input
+                                    class="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                    placeholder="Width" type="number" />
+                                <input
+                                    class="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                    placeholder="Height" type="number" />
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Preferred Pickup Time</label>
+                            <div class="flex gap-4">
+                                <input
+                                    class="flex-1 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                    type="date" />
+                                <input
+                                    class="flex-1 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
+                                    type="time" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-5 space-y-6">
+                <!-- Map Section -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl card-shadow border border-white dark:border-slate-700 overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <span class="text-sm font-bold">Route Visualization</span>
+                        <span
+                            class="text-xs bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 px-2 py-1 rounded-full font-bold"
+                            id="routeStatus">Enter Details</span>
+                    </div>
+
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+                    <div class="h-48 bg-slate-100 dark:bg-slate-900 relative rounded-xl overflow-hidden" id="map"
+                        style="z-index: 1;"></div>
+
+                    <script>
+                        let map;
+                        document.addEventListener('DOMContentLoaded', () => {
+                            map = L.map('map').setView([20.5937, 78.9629], 4); // India Center
+
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            }).addTo(map);
+                        });
+                    </script>
+                </div>
+
+                <!-- Action Section -->
+                <div id="searchAction"
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-6 card-shadow border border-white dark:border-slate-700">
+                    <h3 class="font-bold text-lg mb-4">Find Available Space</h3>
+                    <p class="text-sm text-slate-500 mb-6">Search for trucks traveling on your route with available
+                        capacity.</p>
+
+                    <button onclick="searchTrucks()"
+                        class="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-3">
+                        <span class="material-symbols-outlined">search</span>
+                        Find Trucks
+                    </button>
+                </div>
+
+                <!-- Results Container (Hidden by default) -->
+                <div id="resultsContainer" class="hidden space-y-4">
+                    <h3 class="font-bold text-lg px-2">Available Options (3)</h3>
+
+                    <!-- Result Template - Injected via JS -->
+                    <div id="resultsList" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-12">
+        <div class="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <a href="index.html"
+                class="flex items-center gap-2 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                <div class="w-8 h-8 rounded-lg overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="font-bold text-sm tracking-tight">UNIO</span>
+            </a>
+            <p class="text-sm text-slate-500">© 2024 Unio Logistics &amp; Resources. Shared infrastructure for all.</p>
+            <div class="flex gap-6">
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">public</span></a>
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">mail</span></a>
+                <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span
+                        class="material-symbols-outlined text-lg">share</span></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Auth Check
+        // Auth Check
+        const token = localStorage.getItem('token');
+        // User requested to remove auth requirement for viewing/booking flow
+        // if (!token) {
+        //     window.location.href = 'login.html';
+        // }
+
+        async function searchTrucks() {
+            const pickup = document.querySelector('input[placeholder="Enter collection point"]').value;
+            const delivery = document.querySelector('input[placeholder="Enter destination"]').value;
+            const weight = document.querySelector('input[placeholder="0.00"]').value;
+
+            if (!pickup || !delivery || !weight) {
+                alert("Please fill in Pickup, Delivery, and Weight details.");
+                return;
+            }
+
+            // Mock Search Delay
+            const btn = document.querySelector('#searchAction button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Searching...';
+            btn.disabled = true;
+
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Show Results
+            document.getElementById('searchAction').classList.add('hidden');
+            document.getElementById('resultsContainer').classList.remove('hidden');
+
+            // Generate Mock Data based on input
+            const basePrice = (parseFloat(weight) * 0.5).toFixed(2);
+
+            const results = [
+                { id: 1, name: "Eco Share Truck", type: "Standard", eta: "2 Days", price: basePrice, saving: "45%", icon: "local_shipping", color: "blue" },
+                { id: 2, name: "Express Logistics", type: "Fast", eta: "1 Day", price: (basePrice * 1.5).toFixed(2), saving: "20%", icon: "rocket_launch", color: "purple" },
+                { id: 3, name: "Budget Haul", type: "Saver", eta: "3-4 Days", price: (basePrice * 0.8).toFixed(2), saving: "60%", icon: "savings", color: "emerald" }
+            ];
+
+            const list = document.getElementById('resultsList');
+            list.innerHTML = '';
+
+            results.forEach(truck => {
+                const html = `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all cursor-pointer group"
+                    onclick="selectOption('${truck.name}', ${truck.price}, '${truck.eta}')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-${truck.color}-50 dark:bg-${truck.color}-900/20 flex items-center justify-center text-${truck.color}-600">
+                                <span class="material-symbols-outlined">${truck.icon}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white">${truck.name}</h4>
+                                <p class="text-xs text-slate-500">${truck.type} • ${truck.eta}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full">Save ${truck.saving}</span>
+                    </div>
+                    <div class="flex justify-between items-end border-t border-slate-50 dark:border-slate-700 pt-3 mt-3">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Est. Total</p>
+                            <p class="text-xl font-bold text-slate-900 dark:text-white">$${truck.price}</p>
+                        </div>
+                        <button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">Select</button>
+                    </div>
+                </div>`;
+                list.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function selectOption(name, price, eta) {
+            const pickup = document.querySelector('input[placeholder="Enter collection point"]').value;
+            const delivery = document.querySelector('input[placeholder="Enter destination"]').value;
+            const weight = document.querySelector('input[placeholder="0.00"]').value;
+
+            const bookingDetails = {
+                type: 'cargo_split',
+                pickup: pickup,
+                delivery: delivery,
+                weight: weight,
+                service: name,
+                price: price,
+                eta: eta,
+                date: new Date().toISOString()
+            };
+
+            localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+            window.location.href = 'booking.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Reservation Confirmation Summary - Unio</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <!-- Material Symbols -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark min-h-screen">
+  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+      <!-- Top Navigation Bar -->
+      <header
+        class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3">
+        <div class="flex items-center gap-4 text-slate-900 dark:text-white">
+          <a href="index.html" class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl overflow-hidden">
+              <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+            </div>
+            <h2 class="text-slate-900 dark:text-white text-xl font-extrabold leading-tight tracking-tight">Unio</h2>
+          </a>
+        </div>
+        <div class="flex flex-1 justify-end gap-8">
+          <div class="flex items-center gap-9">
+            <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors"
+              href="#">Dashboard</a>
+            <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors"
+              href="#">Resources</a>
+            <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors"
+              href="#">Reports</a>
+            <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors"
+              href="#">Settings</a>
+          </div>
+          <div
+            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-100 dark:border-slate-800"
+            data-alt="Professional user profile avatar"
+            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9oEa7ura-Wn8uk9AiLZ9-AbQ1GFJprRKM2oJh3hrHwWuQgCt7vaX0DbZBNmnNeLPCu3zynrZAtYWGctl5bgRtu8pQHr4Ho91p-ANrTqgZwxNadL9CbV-MccNIIxMdNcrRcA_VlzxD0v7NDIIiLf8ev4FLOgIWrxth3muoaFiLxE4SIrD4TBjEwpAxyHjPI2oDFZkKfKAIxJpJ7OsFxH3amgbNFUY98O5OWJcVJvyESWPT0_ubeij5HNYSe_0txMVbIqOEaweilBZR");'>
+          </div>
+        </div>
+      </header>
+      <main class="flex flex-1 justify-center py-12 px-6">
+        <div class="layout-content-container flex flex-col max-w-[800px] flex-1">
+          <!-- Success Header -->
+          <div class="flex flex-col items-center text-center mb-10">
+            <div
+              class="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6">
+              <span class="material-symbols-outlined text-5xl">check_circle</span>
+            </div>
+            <h1 class="text-slate-900 dark:text-white tracking-tight text-4xl font-extrabold leading-tight mb-2">
+              Reservation Confirmed!</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-lg font-medium">Your space is ready, Logan. A confirmation
+              email has been sent to your inbox.</p>
+          </div>
+          <!-- Main Confirmation Card -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+            <!-- Card Hero Image (Map/Facility) -->
+            <div class="h-48 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+              <div class="absolute inset-0 bg-cover bg-center opacity-80"
+                data-alt="Aerial view of a logistics warehouse facility" data-location="Chicago"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBWF9RFy4bwpF_jQ-pWBLUpc2Xesvw2_-i-lR4ZQV6eAezm858VDxNiMhuwEcnfWfCi94FqAdsyxgUtVde518EKdj58oHaM_fXSQmEUbDPlBXYvj7WZ1juaoxR8U9O_-hBAw18wUkwx-YtZB6994RG4yVa-5EtvIUDlvnvmbUkVMCEWIP2MiFNuLgSVNa9etd2R_QqXQqLcHXXanagwYSsMFa-vV226dfQTvnPLgbikpT9Ns0uHY1wUnmtUMSTmV7HV53C3g-khfLe-');">
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"></div>
+              <div class="absolute bottom-6 left-8 flex items-center gap-3">
+                <span
+                  class="bg-primary text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">Active
+                  Reservation</span>
+              </div>
+            </div>
+            <div class="p-8">
+              <div
+                class="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-slate-100 dark:border-slate-800 pb-8 mb-8">
+                <div>
+                  <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Reservation ID</h3>
+                  <p class="text-slate-900 dark:text-white text-2xl font-extrabold">#UN-882910</p>
+                </div>
+                <div class="flex gap-3">
+                  <button
+                    class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm font-semibold">
+                    <span class="material-symbols-outlined text-lg">print</span>
+                    Print Summary
+                  </button>
+                  <button
+                    class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm font-semibold">
+                    <span class="material-symbols-outlined text-lg">calendar_add_on</span>
+                    Add to Calendar
+                  </button>
+                </div>
+              </div>
+              <!-- Detail Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 mb-8">
+                <div class="flex gap-4">
+                  <div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined">warehouse</span>
+                  </div>
+                  <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Facility &amp; Slot</p>
+                    <p class="text-slate-900 dark:text-white font-bold">Cold Storage Slot B-12</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Temperature Controlled (4°C)</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                  </div>
+                  <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Date Range</p>
+                    <p class="text-slate-900 dark:text-white font-bold">Oct 24 - Oct 31, 2023</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">7 Days Duration</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined">location_on</span>
+                  </div>
+                  <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Location</p>
+                    <p class="text-slate-900 dark:text-white font-bold">Chicago Hub Alpha</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">4500 Logistics Way, Suite 200, IL</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined">info</span>
+                  </div>
+                  <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Access Credentials</p>
+                    <p class="text-slate-900 dark:text-white font-bold text-sm">QR Code Attached in Email</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Digital access enabled</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Next Steps Section -->
+              <div
+                class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-slate-800">
+                <h4 class="text-slate-900 dark:text-white font-bold mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">near_me</span>
+                  Next Steps for Arrival
+                </h4>
+                <div class="space-y-4">
+                  <div class="flex gap-3">
+                    <div
+                      class="size-6 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      1</div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Arrive at <span class="font-bold">Gate
+                        4</span> during standard operating hours (06:00 - 22:00).</p>
+                  </div>
+                  <div class="flex gap-3">
+                    <div
+                      class="size-6 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      2</div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Scan your <span class="font-bold">Digital QR
+                        code</span> at the self-service terminal to check-in.</p>
+                  </div>
+                  <div class="flex gap-3">
+                    <div
+                      class="size-6 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      3</div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Follow the blue directional floor markings to
+                      <span class="font-bold">Cold Storage Zone B</span>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Card Footer -->
+            <div
+              class="bg-slate-50 dark:bg-slate-800/80 px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <p class="text-slate-500 dark:text-slate-400 text-sm italic">Need to make changes? You can modify this
+                reservation up to 24h before start.</p>
+              <button
+                class="w-full md:w-auto px-10 py-3 bg-primary text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                View in Dashboard
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <!-- Additional Help -->
+          <div class="mt-8 flex justify-center gap-6">
+            <a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary flex items-center gap-1"
+              href="#">
+              <span class="material-symbols-outlined text-sm">help</span>
+              Contact Support
+            </a>
+            <a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary flex items-center gap-1"
+              href="#">
+              <span class="material-symbols-outlined text-sm">description</span>
+              Download Full Contract
+            </a>
+          </div>
+        </div>
+      </main>
+      <!-- Footer Small -->
+      <footer class="py-8 text-center border-t border-slate-200 dark:border-slate-800">
+        <p class="text-slate-400 text-xs">© 2023 Unio Logistics &amp; Resource Management. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+</body>
+
+</html>

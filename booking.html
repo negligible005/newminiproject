@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Booking &amp; Payment Checkout - Unio</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            "display": ["Manrope"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <script src="js/theme.js"></script>
+  <style type="text/tailwindcss">
+    body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .payment-option input:checked + label {
+            border-color: #137fec;
+            background-color: rgba(19, 127, 236, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-[#111418] dark:text-white">
+  <div class="flex flex-col min-h-screen">
+    <header
+      class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-background-dark px-10 py-3 sticky top-0 z-50">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl overflow-hidden">
+          <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+        </div>
+
+        <span class="text-xl font-bold tracking-tight text-[#111418] dark:text-white">
+          UNIO
+        </span>
+      </div>
+
+      <div class="flex items-center gap-8">
+        <nav class="hidden md:flex items-center gap-9">
+          <a class="text-[#111418] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+            href="#">Dashboard</a>
+          <a class="text-primary text-sm font-bold" href="#">Bookings</a>
+          <a class="text-[#111418] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+            href="#">Invoices</a>
+          <a class="text-[#111418] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+            href="#">Resources</a>
+        </nav>
+        <div
+          class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-gray-200 dark:border-gray-700"
+          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9_Lx5E2iXIhlCHuvopVbReTlkkW0sQrXiqUyyNbuoB_yrVc69vRrE4K7hNLXuuOXhPmn4w63SSeF4Bob21YLjaJBTZyynEawjkPnIbLB_wRufh6cGIRzL23Dt_fTqTZFiWg-q_wC_-E8TWQlRfwyUEiBqvB-WML_k9lxzLw60K0rrNRzlQ5AMeSST8TWcai5Y_WWlBWxcb2cPIoiZpq6db__uHmJYnpURM4KIacb3f55XVKBnjskjkKjDaWhIqGKDd0bxptyiSzlW");'>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1 max-w-[1200px] mx-auto w-full px-4 md:px-10 py-10">
+      <div class="mb-8">
+        <div class="flex items-center gap-2 text-sm text-[#617589] mb-4">
+          <span>Select Space</span>
+          <span class="material-symbols-outlined !text-xs">chevron_right</span>
+          <span class="text-primary font-bold">Checkout &amp; Payment</span>
+        </div>
+        <h1 class="text-[#111418] dark:text-white text-3xl font-extrabold tracking-tight">Booking and Payment Checkout
+        </h1>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div class="lg:col-span-2 space-y-6">
+          <section
+            class="bg-white dark:bg-background-dark border border-[#dbe0e6] dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary">person</span>
+              <h3 class="text-lg font-bold">Sender &amp; Receiver Details</h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                  <h4 class="text-sm font-bold uppercase tracking-wider text-[#617589]">Sender Information</h4>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Full Name</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="John Doe" type="text" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Phone Number</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="+91 98765 43210" type="tel" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Email Address</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="john@logistics.com" type="email" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Pickup Address</label>
+                    <textarea
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="Street name, Building, Area..." rows="2"></textarea>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  <h4 class="text-sm font-bold uppercase tracking-wider text-[#617589]">Receiver Information</h4>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Full Name</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="Jane Smith" type="text" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Phone Number</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="+91 87654 32109" type="tel" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Email Address</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="jane@target.com" type="email" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Delivery Address</label>
+                    <textarea
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="Street name, Building, Area..." rows="2"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section
+            class="bg-white dark:bg-background-dark border border-[#dbe0e6] dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary">inventory_2</span>
+              <h3 class="text-lg font-bold">Booking Details</h3>
+            </div>
+            <div class="p-6">
+              <div class="flex flex-wrap gap-6 items-center">
+                <div class="flex-1 min-w-[200px]">
+                  <p class="text-xs text-[#617589] font-bold uppercase mb-1">Service Type</p>
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary !text-lg">splitscreen</span>
+                    <p class="font-bold">Cargo Split - Shared Space</p>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-[120px]">
+                  <p class="text-xs text-[#617589] font-bold uppercase mb-1">Selected Capacity</p>
+                  <p class="font-bold">500 kg</p>
+                </div>
+                <div class="flex-1 min-w-[120px]">
+                  <p class="text-xs text-[#617589] font-bold uppercase mb-1">Route</p>
+                  <p class="font-bold">BLR <span class="text-primary">→</span> HYD</p>
+                </div>
+                <div class="flex-1 min-w-[150px]">
+                  <p class="text-xs text-[#617589] font-bold uppercase mb-1">Expected Pickup</p>
+                  <p class="font-bold">Oct 26, 2023</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section
+            class="bg-white dark:bg-background-dark border border-[#dbe0e6] dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">payments</span>
+                <h3 class="text-lg font-bold">Payment Information</h3>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-[#617589]">
+                <span class="material-symbols-outlined !text-sm text-green-500">lock</span>
+                Secure encrypted payment
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="payment-option">
+                  <input checked="" class="hidden" id="card" name="payment_method" type="radio" />
+                  <label
+                    class="flex flex-col items-center justify-center p-4 border-2 border-[#dbe0e6] dark:border-gray-700 rounded-xl cursor-pointer hover:border-primary transition-all"
+                    for="card">
+                    <span class="material-symbols-outlined mb-2 !text-3xl">credit_card</span>
+                    <span class="text-sm font-bold">Card</span>
+                  </label>
+                </div>
+                <div class="payment-option">
+                  <input class="hidden" id="upi" name="payment_method" type="radio" />
+                  <label
+                    class="flex flex-col items-center justify-center p-4 border-2 border-[#dbe0e6] dark:border-gray-700 rounded-xl cursor-pointer hover:border-primary transition-all"
+                    for="upi">
+                    <span class="material-symbols-outlined mb-2 !text-3xl">qr_code_2</span>
+                    <span class="text-sm font-bold">UPI / GPay</span>
+                  </label>
+                </div>
+                <div class="payment-option">
+                  <input class="hidden" id="netbanking" name="payment_method" type="radio" />
+                  <label
+                    class="flex flex-col items-center justify-center p-4 border-2 border-[#dbe0e6] dark:border-gray-700 rounded-xl cursor-pointer hover:border-primary transition-all"
+                    for="netbanking">
+                    <span class="material-symbols-outlined mb-2 !text-3xl">account_balance</span>
+                    <span class="text-sm font-bold">Net Banking</span>
+                  </label>
+                </div>
+              </div>
+              <div class="space-y-4" id="card-form">
+                <div>
+                  <label class="block text-sm font-medium mb-1.5">Card Number</label>
+                  <div class="relative">
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 pl-12 focus:ring-primary focus:border-primary"
+                      placeholder="XXXX XXXX XXXX 1234" type="text" />
+                    <span class="material-symbols-outlined absolute left-4 top-2.5 text-[#617589]">credit_card</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">Expiry Date</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="MM/YY" type="text" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1.5">CVV</label>
+                    <input
+                      class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                      placeholder="***" type="password" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1.5">Cardholder Name</label>
+                  <input
+                    class="w-full rounded-lg border-[#dbe0e6] dark:border-gray-700 dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
+                    placeholder="Name as on card" type="text" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <aside class="space-y-6">
+          <div
+            class="bg-white dark:bg-background-dark border border-[#dbe0e6] dark:border-gray-800 rounded-xl shadow-sm p-6 sticky top-24">
+            <h4 class="text-lg font-bold mb-6">Order Summary</h4>
+            <div class="space-y-4 mb-6">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-[#617589]">Cargo Split (500kg)</span>
+                <span class="font-medium">$250.00</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-[#617589]">Insurance (Comprehensive)</span>
+                <span class="font-medium">$15.00</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-[#617589]">Platform Service Fee</span>
+                <span class="font-medium">$13.25</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-[#617589]">Estimated Tax</span>
+                <span class="font-medium">$0.00</span>
+              </div>
+            </div>
+            <hr class="border-[#dbe0e6] dark:border-gray-800 mb-6" />
+            <div class="flex justify-between items-center mb-8">
+              <div>
+                <p class="text-sm font-bold">Total Amount</p>
+                <p class="text-xs text-[#617589]">Including all taxes</p>
+              </div>
+              <p class="text-2xl font-extrabold text-primary">$278.25</p>
+            </div>
+            <a href="bookingconfi.html">
+              <button
+                class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                Confirm &amp; Pay
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </a>
+
+            <p class="text-center text-[10px] text-[#617589] mt-6 leading-relaxed">
+              By clicking "Confirm &amp; Pay", you agree to Unio's <a class="underline" href="#">Terms of Service</a>
+              and <a class="underline" href="#">Cargo Liability Policy</a>.
+            </p>
+          </div>
+          <a href="index.html" class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl overflow-hidden">
+              <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+            </div>
+            <span class="text-2xl font-bold tracking-tight">UNIO</span>
+          </a>
+        </aside>
+      </div>
+    </main>
+    <footer
+      class="border-t border-[#dbe0e6] dark:border-gray-800 py-8 text-center bg-white dark:bg-background-dark mt-10">
+      <p class="text-sm text-[#617589]">© 2023 Unio Platform. All Rights Reserved.</p>
+      <div class="flex justify-center gap-4 mt-2">
+        <a class="text-xs text-[#617589] hover:text-primary" href="#">Terms of Service</a>
+        <a class="text-xs text-[#617589] hover:text-primary" href="#">Privacy Policy</a>
+        <a class="text-xs text-[#617589] hover:text-primary" href="#">Refund Policy</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const details = JSON.parse(localStorage.getItem('bookingDetails'));
+
+      if (details) {
+        // Update Route
+        const routeElement = document.querySelector('.flex-1.min-w-\\[120px\\] p:nth-child(2)');
+        if (routeElement) routeElement.innerHTML = `${details.pickup.split(' ')[0]} <span class="text-primary">→</span> ${details.delivery.split(' ')[0]}`;
+
+        // Update Weight & Capacity
+        const capacityElement = document.querySelector('.flex-1.min-w-\\[120px\\]:nth-child(2) p:nth-child(2)');
+        if (capacityElement) capacityElement.textContent = details.weight + ' kg';
+
+        // Update Service Type
+        const serviceElement = document.querySelector('.flex-1.min-w-\\[200px\\] p:nth-child(2)');
+        if (serviceElement) serviceElement.textContent = `Cargo Split - ${details.service}`;
+
+        // Update Pickup Date (Mock)
+        const dateElement = document.querySelector('.flex-1.min-w-\\[150px\\] p:nth-child(2)');
+        if (dateElement) dateElement.textContent = new Date().toLocaleDateString();
+
+        // Update Price Breakdown
+        // Base Rate
+        const rateRow = document.querySelector('tbody tr:nth-child(1)');
+        if (rateRow) {
+          rateRow.querySelector('td:nth-child(1)').textContent = `Cargo Split - ${details.weight}kg (${details.pickup} to ${details.delivery})`;
+          rateRow.querySelector('td:nth-child(3)').textContent = `$${details.price}`;
+        }
+
+        // Update Total
+        const total = (parseFloat(details.price) + 15.00 + 13.25).toFixed(2);
+        document.querySelector('.text-2xl.font-extrabold.text-primary').textContent = `$${total}`;
+      }
+    });
+  </script>
+</body>
+
+</html>

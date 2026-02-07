@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Unio | Universal Space Splitting</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2563eb",
+            "background-light": "#f8fafc",
+            "background-dark": "#0f172a",
+            navy: {
+              900: "#1e293b",
+              950: "#0f172a",
+            }
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.75rem",
+            'xl': '1.5rem',
+            '2xl': '2.5rem',
+          },
+        },
+      },
+    };
+  </script>
+  <script src="js/theme.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif
+    }
+
+    .hero-split-left {
+      background-image: linear-gradient(rgba(30, 41, 59, 0.7), rgba(30, 41, 59, 0.7)), url(https://lh3.googleusercontent.com/aida-public/AB6AXuBZaCpxwFyVpgrfjAaoKdenuP6jouBa91jCGNU6Ra7FbUUppxIhCgqzI6F6EM1F_a_3XF90NKpcI8jyD8yspo5uYc3JsT1z9olRrT9QiQD9tSx7yLgIiFTdv4n9wR7-43ACXtWygrUq_kusoOFIhEvWrQiM-fFfb5MA7a7nsRHiVmCwezhz-i3d1L-upfRKIwqWWM7dhpP4yIDzrR9-B2guOU3ewzbs66BfH9w1gTCDTsIOk_4L6uhO6fZFwhCtPZcUqZpgBYZGtMxz);
+      background-size: cover;
+      background-position: center
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-300">
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-navy-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl overflow-hidden">
+            <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+          </div>
+
+          <span class="text-2xl font-bold tracking-tight">UNIO</span>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+
+        <!-- SERVICES -->
+        <div class="relative group">
+          <a class="hover:text-primary transition-colors cursor-pointer">Services</a>
+
+          <div
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
+            <a href="#" class="block py-2 hover:text-primary">Cargo Split</a>
+            <a href="#" class="block py-2 hover:text-primary">Cold Chain</a>
+            <a href="#" class="block py-2 hover:text-primary">Cab Sharing</a>
+          </div>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="relative group">
+          <a class="hover:text-primary transition-colors cursor-pointer">About Us</a>
+
+          <div
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
+            <a href="#" class="block py-2 hover:text-primary">Our Mission</a>
+            <a href="#" class="block py-2 hover:text-primary">Team</a>
+            <a href="#" class="block py-2 hover:text-primary">SDGs</a>
+          </div>
+        </div>
+
+        <!-- PORTFOLIO -->
+        <div class="relative group">
+          <a class="hover:text-primary transition-colors cursor-pointer">Portfolio</a>
+
+          <div
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
+            <a href="#" class="block py-2 hover:text-primary">Providers</a>
+            <a href="#" class="block py-2 hover:text-primary">Consumers</a>
+            <a href="#" class="block py-2 hover:text-primary">Case Studies</a>
+          </div>
+        </div>
+
+      </nav>
+
+      <div class="flex items-center space-x-4">
+        <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          onclick="window.toggleTheme()">
+          <span class="material-icons text-xl dark:hidden">dark_mode</span>
+          <span class="material-icons text-xl hidden dark:block">light_mode</span>
+        </button>
+        <a href="login.html">
+          <button
+            class="px-6 py-2.5 rounded-full bg-navy-950 dark:bg-white dark:text-navy-950 text-white font-semibold hover:opacity-90 transition-opacity">
+            Login / Sign Up
+          </button>
+        </a>
+      </div>
+    </div>
+  </header>
+  <main class="pt-20">
+    <section class="min-h-[85vh] flex flex-col md:flex-row overflow-hidden">
+      <div
+        class="w-full md:w-1/2 hero-split-left flex items-center justify-center p-12 relative group cursor-pointer overflow-hidden">
+        <div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        </div>
+        <div class="relative z-10 text-center text-white">
+          <h2 class="text-7xl font-black mb-4 tracking-tighter">PROVIDER</h2>
+          <p class="text-xl text-slate-200 mb-8 max-w-md mx-auto">Monetize your unused space. List your cargo trucks,
+            warehouses, or transport assets.</p>
+          <a href="provider.html">
+            <button
+              class="bg-white text-navy-950 px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl">
+              List Capacity
+            </button>
+          </a>
+
+        </div>
+      </div>
+      <div
+        class="w-full md:w-1/2 bg-white dark:bg-navy-950 flex items-center justify-center p-12 relative group cursor-pointer">
+        <div class="relative z-10 text-center">
+          <h2 class="text-7xl font-black text-navy-950 dark:text-white mb-4 tracking-tighter">CONSUMER</h2>
+          <p class="text-xl text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Find affordable logistics. Rent
+            partial pallet space or share a ride effortlessly.</p>
+          <a href="consumer.html">
+            <button
+              class="bg-primary text-white px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl">
+              Book Space
+            </button>
+          </a>
+
+        </div>
+        <div class="absolute bottom-10 right-10 opacity-10">
+          <span class="material-icons text-[200px] text-navy-950 dark:text-white select-none">share_location</span>
+        </div>
+      </div>
+    </section>
+    <section class="py-24 px-6 bg-slate-50 dark:bg-navy-900/50">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Platform Overview</h3>
+          <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white">Smart Splitting for Global Logistics</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Amount Earned</p>
+            <h4 class="text-3xl font-bold mb-2">$12,450.00</h4>
+            <div class="flex items-center text-emerald-500 text-sm font-semibold">
+              <span class="material-icons text-sm mr-1">trending_up</span>
+              +12.5% this month
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Amount Saved</p>
+            <h4 class="text-3xl font-bold mb-2">$3,120.45</h4>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-4">
+              <div class="bg-primary h-full rounded-full w-[65%]"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">65% of your monthly goal</p>
+          </div>
+          <div
+            class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Active Splits</p>
+            <h4 class="text-3xl font-bold mb-2">24</h4>
+            <div class="flex -space-x-2 mt-4">
+              <img alt="User avatar" class="w-8 h-8 rounded-full border-2 border-white dark:border-navy-950"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJMjJeqpQxOEsuhddvySChYbeiBcTVz46n8WkJqyPG9ezP6Mwd8-g7qV8azE3H0xIq8YuYRlk76bAhVnfoi8Rq4GvieFR-XcbpmC2TzolBPUjlj5k6QMdpRp6MdlnsvkmxgTQNijWvs2JXLggl0NCnjkZdODnCpLoSM66sZ6P12v9Gux-yqdAcLbvLKMo4227BOP8uGkzzDSy0X64Gm-iX4hpqiBA0tQ9CZ3Hrfs66Iz8Me6PChbXCQr6ZcSsDBxC1vF_N02siVbC9" />
+              <img alt="User avatar" class="w-8 h-8 rounded-full border-2 border-white dark:border-navy-950"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGVeZGMM6wxxGkklfZWqngWgDOX3uFdx_uQjC2Qfb-Hll-R2lZiXEOIRiX-EYxvAFmKCB8O9Ncelv0NysSlELF3P_voojcsLyesKESc68fvHE4AXs_-Q2xaYqlOewxcwDlfa9tv71ncizI6EiJ6jK7y0t9eoOGeTC1MqF6RLY9f99feGn0npEXPtEswyXHZM6KnwGoaNYvWz_a10Np6FMTwOc5VUoeP5LGAczwpwevXuslK0DzjuFhsOBkHNp88bRQjuN7SbwLsn8n" />
+              <img alt="User avatar" class="w-8 h-8 rounded-full border-2 border-white dark:border-navy-950"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG7aYdtysnXd8oLAEsZ-hs0X7UIpjentYEeweuvVvinyzNgm-LycyV2BeO3IBm52Ns1i1ej9Bmem7TtG_focyFJ8WBL_ktMYj5NddNDGB1cR6-CuiIsO56GUtaGdIpo4LKLWYLLzM77XjS5fh78UhIIRIUgM85Lg6sUNtDi83EC98_LlhFQa7k5AMuPOfJ5lPpHx9EMxhmhpBe2eVe5WKYHUIyUzyr7fkeI-uRlEaox9B1OdBWX4_Q6zpArbWOgDLerQqZ06jxzvSe" />
+              <div
+                class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">
+                +12</div>
+            </div>
+          </div>
+          <div class="bg-primary p-8 rounded-2xl shadow-lg flex flex-col justify-between text-white">
+            <p class="font-medium opacity-90">Start Your Journey</p>
+            <a href="consumer.html">
+              <div class="flex items-center justify-between group cursor-pointer">
+                <h4 class="text-xl font-bold">Start Splitting</h4>
+                <span
+                  class="material-icons transform group-hover:translate-x-1 transition-transform">chevron_right</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-24 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <h2 class="text-4xl font-extrabold mb-4">Trending Opportunities</h2>
+            <p class="text-slate-500 dark:text-slate-400">Join real-time split requests near your current location.</p>
+          </div>
+          <div class="flex bg-slate-100 dark:bg-navy-900 p-1 rounded-xl">
+            <button class="px-6 py-2 bg-white dark:bg-navy-800 shadow-sm rounded-lg font-semibold">Local</button>
+            <button
+              class="px-6 py-2 text-slate-500 font-semibold hover:text-navy-950 dark:hover:text-white transition-colors">Global</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div
+            class="bg-white dark:bg-navy-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 hover:shadow-xl transition-shadow group">
+            <div class="flex items-start justify-between mb-6">
+              <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl">
+                <span class="material-icons text-blue-600 dark:text-blue-400">local_shipping</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full">500kg
+                Left</span>
+            </div>
+            <h3 class="text-xl font-bold mb-1">Cargo Split: Bangalore</h3>
+            <p class="text-slate-400 text-sm mb-4">Jan 20th • Container Space</p>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
+              <span class="text-navy-950 dark:text-white font-bold">$120/slot</span>
+              <a href="consumer.html">
+                <button
+                  class="bg-navy-950 dark:bg-white text-white dark:text-navy-950 px-6 py-2 rounded-lg font-bold text-sm">Book</button>
+              </a>
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-navy-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 hover:shadow-xl transition-shadow group">
+            <div class="flex items-start justify-between mb-6">
+              <div class="bg-red-50 dark:bg-red-900/30 p-3 rounded-xl">
+                <span class="material-icons text-red-600 dark:text-red-400">ac_unit</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full">-18°C
+                Frozen</span>
+            </div>
+            <h3 class="text-xl font-bold mb-1">Alpha Logistics Hub</h3>
+            <p class="text-slate-400 text-sm mb-4">Ernakulam North • 12 Pallets</p>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
+              <span class="text-navy-950 dark:text-white font-bold">$45/day</span>
+              <a href="consumer.html">
+                <button
+                  class="bg-navy-950 dark:bg-white text-white dark:text-navy-950 px-6 py-2 rounded-lg font-bold text-sm">Reserve</button>
+              </a>
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-navy-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 hover:shadow-xl transition-shadow group">
+            <div class="flex items-start justify-between mb-6">
+              <div class="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-xl">
+                <span class="material-icons text-amber-600 dark:text-amber-400">directions_car</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-full">2
+                slots away</span>
+            </div>
+            <h3 class="text-xl font-bold mb-1">Cab to FISAT</h3>
+            <p class="text-slate-400 text-sm mb-4">Today, 3:30 PM • Uber XL</p>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
+              <span class="text-navy-950 dark:text-white font-bold">$4.50</span>
+              <a href="consumer.html">
+                <button
+                  class="bg-navy-950 dark:bg-white text-white dark:text-navy-950 px-6 py-2 rounded-lg font-bold text-sm">Join</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-24 px-6 bg-navy-950 text-white relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-1/3 h-full bg-primary/20 blur-[100px] -translate-y-1/2"></div>
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <h2 class="text-5xl md:text-6xl font-black mb-8 leading-tight">Ready to split your world?</h2>
+        <p class="text-xl text-slate-300 mb-12">Join thousands of businesses and individuals optimizing their resources
+          through the Unio platform.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="login.html" class="w-full sm:w-auto">
+            <button
+              class="w-full px-10 py-5 bg-primary rounded-full font-bold text-lg hover:bg-blue-500 transition-colors shadow-2xl">Get
+              Started Now</button>
+          </a>
+          <a href="contact.html" class="w-full sm:w-auto">
+            <button
+              class="w-full px-10 py-5 border border-white/20 rounded-full font-bold text-lg hover:bg-white/10 transition-colors">Talk
+              to Sales</button>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="bg-white dark:bg-navy-950 border-t border-slate-100 dark:border-slate-800 py-12 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg overflow-hidden">
+          <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight">UNIO</span>
+      </a>
+      <div class="flex space-x-8 text-sm text-slate-500 font-medium">
+        <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+        <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+        <a class="hover:text-primary transition-colors" href="#">Contact</a>
+        <a class="hover:text-primary transition-colors" href="#">Blog</a>
+      </div>
+      <p class="text-slate-400 text-sm">© 2023 UNIO Technologies. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
