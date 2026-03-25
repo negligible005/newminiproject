@@ -11,7 +11,7 @@
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/sys/session');
+        const res = await fetch('/api/sys/session');
         if (!res.ok) return; // Server error — don't force logout
         const data = await res.json();
 

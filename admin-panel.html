@@ -284,14 +284,14 @@
     </main>
 
     <script>
-        const MAIN_API = 'http://localhost:3000/api';
+        const MAIN_API = '/api';
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user'));
 
         // Basic check - will redirect to main login if not authenticated as admin
         if (!token || !user || user.role !== 'admin') {
             alert('Admin access required. Please login to the main application first.');
-            window.location.href = 'http://localhost:3000/login.html';
+            window.location.href = '/login.html';
         }
 
         document.getElementById('adminName').innerText = user.name;

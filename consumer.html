@@ -728,7 +728,7 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:3000/api';
+    const API_URL = '/api';
     let user = null;
     let allListings = [];
     let cachedMySplits = [];
@@ -799,7 +799,7 @@
     // --- Real-Time (Socket.IO) ---
     let socket;
     function initRealTime(userId) {
-      socket = io('http://localhost:3000');
+      socket = io();
       
       socket.on('connect', () => {
         console.log('[SOCKET] Connected as', socket.id);
