@@ -3,14 +3,21 @@
 
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Unio | Consumer Dashboard</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
     rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -35,6 +42,7 @@
   </script>
   <script src="js/auth.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/payment-system.js"></script>
   <style type="text/tailwindcss">
     @layer base {
             body {
@@ -73,6 +81,28 @@
         .overlay-open { animation: macOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .overlay-close { animation: macClose 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .no-scroll { overflow: hidden; }
+
+        /* AI Assistant Styles */
+        #aiAssistantChat {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px) scale(0.95);
+        }
+        #aiAssistantChat.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            display: flex;
+        }
+        .custom-marker {
+            background: none !important;
+            border: none !important;
+        }
+        /* Stepper Styles */
+        .step-active { color: #3B82F6; }
+        .step-active .step-icon { background: #3B82F6; color: white; border-color: #3B82F6; }
+        .step-completed { color: #10B981; }
+        .step-completed .step-icon { background: #10B981; color: white; border-color: #10B981; }
+        .step-line { position: absolute; left: 15px; top: 30px; bottom: -10px; width: 2px; background: #E2E8F0; z-index: 0; }
+        .step-item:last-child .step-line { display: none; }
     </style>
 </head>
 
@@ -151,9 +181,9 @@
   </nav>
 
   <main class="max-w-[1440px] mx-auto px-6 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div style="display:flex; flex-direction:row; flex-wrap:nowrap; gap:1.5rem; align-items:flex-start; width:100%;">
       <!-- Main Content Area -->
-      <div class="flex-1 min-w-0">
+      <div style="flex:1; min-width:0; overflow:hidden;">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
@@ -162,11 +192,7 @@
               and manage your shared resources.</p>
           </div>
           <div class="flex gap-3">
-            <button onclick="openCustomSplitModal()"
-              class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 font-semibold rounded-full hover:shadow-lg transition-all">
-              <span class="material-symbols-outlined text-lg">add_circle</span>
-              New Split
-            </button>
+
             <a href="booking.html"
               class="flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all">
               <span class="material-symbols-outlined text-lg">add</span>
@@ -177,8 +203,8 @@
 
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-primary transition-all">
+          <div onclick="openSavingsAnalytics()"
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-primary transition-all cursor-pointer">
             <div
               class="absolute right-[-20px] top-[-20px] w-32 h-32 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-all">
             </div>
@@ -189,8 +215,8 @@
               Smart savings
             </div>
           </div>
-          <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-primary transition-all">
+          <div onclick="openManageSplitsModal()"
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-primary transition-all cursor-pointer">
             <div
               class="absolute right-[-20px] top-[-20px] w-32 h-32 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-all">
             </div>
@@ -203,102 +229,145 @@
         </div>
 
         <!-- Content Sections -->
-        <div class="space-y-12">
-          <!-- Logistics & Storage -->
-          <section>
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
-                  <span class="material-symbols-outlined">local_shipping</span>
-                </div>
-                <h2 class="text-xl font-bold">Logistics & Storage</h2>
+        <div class="relative w-full max-w-full">
+          <!-- Tabs / Header -->
+          <div
+            class="flex items-center gap-4 md:gap-8 mb-8 overflow-x-auto sidebar-scroll pb-2 hide-scrollbar whitespace-nowrap"
+            id="categoryTabs">
+            <button onclick="switchCategory('logistics')" id="tab-logistics"
+              class="tab-btn active group flex items-center gap-3 opacity-100 transition-all">
+              <div
+                class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105">
+                <span class="material-symbols-outlined">local_shipping</span>
               </div>
-              <div class="flex items-center gap-4">
-                <button
-                  class="text-xs font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1 group"
-                  onclick="openExtendedView('logistics')">
-                  VIEW ALL <span
-                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </button>
-                <button class="text-sm font-semibold text-primary hover:underline"
-                  onclick="window.location.href='cargo.html'">Browse Map</button>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="logisticsContainer">
-              <div class="col-span-2 text-center py-8 text-slate-500">Loading listings...</div>
-            </div>
-          </section>
+              <h2 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Logistics & Storage</h2>
+            </button>
 
-          <!-- Digital & Subscriptions -->
-          <section>
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center">
-                  <span class="material-symbols-outlined">subscriptions</span>
-                </div>
-                <h2 class="text-xl font-bold">Digital & Subscriptions</h2>
+            <button onclick="switchCategory('digital')" id="tab-digital"
+              class="tab-btn group flex items-center gap-3 opacity-50 hover:opacity-100 transition-all">
+              <div
+                class="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105">
+                <span class="material-symbols-outlined">subscriptions</span>
               </div>
-              <button
-                class="text-xs font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1 group"
-                onclick="openExtendedView('digital')">
-                VIEW ALL <span
-                  class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="digitalContainer">
-              <!-- Digital listings -->
-            </div>
-          </section>
+              <h2 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Digital & Subscriptions</h2>
+            </button>
 
-          <!-- Custom Splits -->
-          <section>
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center">
-                  <span class="material-symbols-outlined">group</span>
-                </div>
-                <h2 class="text-xl font-bold">Custom Splits</h2>
+            <button onclick="switchCategory('custom')" id="tab-custom"
+              class="tab-btn group flex items-center gap-3 opacity-50 hover:opacity-100 transition-all">
+              <div
+                class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105">
+                <span class="material-symbols-outlined">group</span>
               </div>
-              <button
-                class="text-xs font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1 group"
-                onclick="openExtendedView('custom')">
-                VIEW ALL <span
-                  class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </button>
+              <h2 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Custom Splits</h2>
+            </button>
+
+
+
+            <div class="ml-auto flex items-center gap-4 pl-4 border-l border-slate-200 dark:border-slate-800"
+              id="categoryActions">
+              <button class="text-sm font-semibold text-primary hover:underline whitespace-nowrap"
+                onclick="window.location.href='cargo.html'">Browse Map</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="customContainer">
-              <!-- Custom listings -->
+          </div>
+
+          <!-- Separator & Slider Container -->
+          <div class="pt-6 border-t border-slate-200 dark:border-slate-800">
+            <div class="overflow-hidden relative w-full">
+              <div class="flex transition-transform duration-500 ease-out w-full items-start" id="sectionsSlider">
+                <!-- Logistics -->
+                <div class="w-full shrink-0 flex-none px-1" id="section-logistics">
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2 max-h-[640px] overflow-y-auto sidebar-scroll pr-2"
+                    id="logisticsContainer">
+                    <div class="col-span-2 text-center py-8 text-slate-500">Loading listings...</div>
+                  </div>
+                </div>
+                <!-- Digital -->
+                <div class="w-full shrink-0 flex-none px-1" id="section-digital">
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2 max-h-[640px] overflow-y-auto sidebar-scroll pr-2"
+                    id="digitalContainer">
+                    <!-- Digital listings -->
+                  </div>
+                </div>
+                <!-- Custom -->
+                <div class="w-full shrink-0 flex-none px-1" id="section-custom">
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2 max-h-[640px] overflow-y-auto sidebar-scroll pr-2"
+                    id="customContainer">
+                    <!-- Custom listings -->
+                  </div>
+                </div>
+              </div>
             </div>
-          </section>
+          </div>
+
+          <!-- Pagination Dots -->
+          <div class="flex items-center justify-center gap-3 mt-6 mb-2" id="sliderDots">
+            <button onclick="switchCategory('logistics')"
+              class="w-2.5 h-2.5 rounded-full bg-primary transition-all slider-dot" id="dot-logistics"
+              aria-label="Logistics"></button>
+            <button onclick="switchCategory('digital')"
+              class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 transition-all slider-dot" id="dot-digital"
+              aria-label="Digital"></button>
+            <button onclick="switchCategory('custom')"
+              class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 transition-all slider-dot" id="dot-custom"
+              aria-label="Custom"></button>
+
+          </div>
         </div>
       </div>
 
-      <!-- Right Sidebar: Joined Splits -->
-      <aside class="w-full lg:w-[380px] space-y-6">
+      <!-- Right Sidebar: Joined Splits & Live Tracking -->
+      <aside style="width:360px; min-width:360px; flex-shrink:0; flex-grow:0; align-self:stretch;">
         <div
           class="bg-white dark:bg-slate-800 rounded-3xl p-6 card-shadow border border-slate-100 dark:border-slate-800 sticky top-28 h-[calc(100vh-140px)] flex flex-col">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">My Joined Splits</h3>
-              <p class="text-xs text-slate-500">Active participations</p>
-            </div>
-            <span class="bg-primary/10 text-primary py-1 px-3 rounded-full text-[10px] font-bold"
-              id="totalJoinedCount">0 Active</span>
-          </div>
-
-          <div class="flex-grow overflow-y-auto sidebar-scroll pr-2 space-y-4" id="joinedSplitsContainer">
-            <div class="text-center py-12 text-slate-500 text-sm">No joined splits yet.</div>
-          </div>
-
-          <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
-            <button onclick="openCustomSplitModal()"
-              class="w-full py-4 bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-2xl font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-lg">add_circle</span>
-              Create Your Own Split
+          
+          <!-- Tabs for Sidebar -->
+          <div class="flex gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-2">
+            <button onclick="switchSidebarTab('splits')" id="tab-side-splits" class="text-xs font-black uppercase tracking-wider text-primary border-b-2 border-primary pb-2">Splits</button>
+            <button onclick="switchSidebarTab('tracking')" id="tab-side-tracking" class="text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1">
+              Tracking 
+              <span id="trackingDot" class="w-1.5 h-1.5 bg-red-500 rounded-full hidden"></span>
             </button>
+          </div>
+
+          <!-- Splits Container -->
+          <div id="side-splits-content" class="flex flex-col flex-grow overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">My Joined Splits</h3>
+                <p class="text-xs text-slate-500">Active participations</p>
+              </div>
+              <span class="bg-primary/10 text-primary py-1 px-3 rounded-full text-[10px] font-bold"
+                id="totalJoinedCount">0 Active</span>
+            </div>
+
+            <div class="flex-grow overflow-y-auto sidebar-scroll pr-2 space-y-4" id="joinedSplitsContainer">
+              <div class="text-center py-12 text-slate-500 text-sm">No joined splits yet.</div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
+              <button onclick="openCustomSplitModal()"
+                class="w-full py-4 bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-2xl font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg">add_circle</span>
+                Create Your Own Split
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Tracking Container -->
+          <div id="side-tracking-content" class="hidden flex-col flex-grow overflow-hidden">
+             <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">Order Tracking</h3>
+                <div class="flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
+                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> LIVE
+                </div>
+             </div>
+             
+             <div class="flex-grow overflow-y-auto sidebar-scroll pr-2 space-y-6" id="liveTrackingList">
+                <div class="text-center py-12 text-slate-500 text-sm italic">No active orders to track.</div>
+             </div>
           </div>
         </div>
       </aside>
@@ -388,16 +457,16 @@
           <div id="categorySpecificFields">
             <!-- Dynamically updated -->
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-4" id="capacityPriceGrid">
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Slots</label>
               <input type="number" id="splitCapacity" required min="1"
                 class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
                 placeholder="e.g. 5">
             </div>
-            <div>
+            <div id="priceSlotContainer">
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price/Slot (₹)</label>
-              <input type="number" id="splitPrice" required min="1" step="0.01"
+              <input type="number" id="splitPrice" required min="0" step="0.01"
                 class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
                 placeholder="₹0.00">
             </div>
@@ -452,14 +521,265 @@
     </div>
   </div>
 
+  <!-- AI Assistant Floating Button & Chat -->
+  <div class="fixed bottom-8 right-8 z-[120] flex flex-col items-end gap-4">
+    <!-- Chat Window -->
+    <div id="aiAssistantChat"
+      class="hidden flex-col w-[380px] h-[500px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-white/20 dark:border-slate-700/50 overflow-hidden opacity-0">
+      <div class="p-6 bg-primary text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <span class="material-symbols-outlined">smart_toy</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">UNIO Assistant</h4>
+            <p class="text-[10px] opacity-80">Online & Ready to Help</p>
+          </div>
+        </div>
+        <button onclick="toggleAIChat()" class="hover:rotate-90 transition-transform">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div id="aiMessageArea" class="flex-1 overflow-y-auto p-6 space-y-4 sidebar-scroll">
+        <!-- Messages will be injected here -->
+      </div>
+
+      <div class="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700">
+        <div id="aiOptionsArea" class="flex flex-col gap-2">
+            <!-- Dynamic option buttons will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button onclick="toggleAIChat()" id="aiToggleBtn"
+      class="w-16 h-16 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group relative">
+      <span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">smart_toy</span>
+      <div
+        class="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-900 rounded-full">
+      </div>
+    </button>
+  </div>
+
+  <!-- Manage Splits Modal -->
+  <div id="manageSplitsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeManageSplitsModal()"></div>
+    <div
+      class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden animate-slide-up flex flex-col max-h-[90vh]">
+      <div
+        class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white">Manage My Splits</h2>
+          <p class="text-sm text-slate-500">View, edit, or delete splits you've created.</p>
+        </div>
+        <button onclick="closeManageSplitsModal()"
+          class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30 flex items-center justify-center transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-8 overflow-y-auto" id="manageSplitsContainer">
+        <p class="text-center text-slate-500 py-8">Loading your splits...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Split Modal -->
+  <div id="editSplitModal"
+    class="fixed inset-0 z-[105] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-up relative">
+      <div class="flex items-center mb-8 gap-4 justify-between">
+        <h3 class="text-2xl font-bold text-slate-900 dark:text-white" id="editModalContentTitle">Edit Split</h3>
+        <button onclick="closeEditSplitModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="editSplitForm" class="space-y-5">
+        <input type="hidden" id="editSplitId">
+        <input type="hidden" id="editSplitType">
+
+        <!-- Field: Category / Form (Logistics/Digital uses different label than Custom) -->
+        <div id="editCategoryField" class="hidden">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
+          <input type="text" id="editSplitCategory" disabled
+            class="w-full bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm cursor-not-allowed">
+        </div>
+
+        <div>
+          <label id="editSplitNameLabel"
+            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Split Name</label>
+          <input type="text" id="editSplitName" required
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label id="editSplitCapacityLabel"
+              class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Slots</label>
+            <input type="text" id="editSplitCapacity" required
+              class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price/Slot (₹)</label>
+            <input type="number" id="editSplitPrice" required step="0.01" min="1"
+              class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+          </div>
+        </div>
+
+        <div id="editSplitLocationField" class="hidden">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Location Selection</label>
+
+          <div id="editRouteInputsContainer" class="space-y-3">
+            <!-- Start Search -->
+            <div class="relative autocomplete-container">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-emerald-500 text-[18px]">trip_origin</span>
+                <input id="editStartSearch" type="text" placeholder="Start Location"
+                  class="flex-1 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                  oninput="handleEditSearchInput(this, 'start')">
+              </div>
+              <div id="editStartResults"
+                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+              </div>
+            </div>
+
+            <!-- Stops Container -->
+            <div id="editStopsInputsContainer" class="space-y-3"></div>
+
+            <!-- End Search -->
+            <div class="relative autocomplete-container">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-red-500 text-[18px]">location_on</span>
+                <input id="editEndSearch" type="text" placeholder="End Destination"
+                  class="flex-1 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                  oninput="handleEditSearchInput(this, 'end')">
+              </div>
+              <div id="editEndResults"
+                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+              </div>
+            </div>
+          </div>
+
+          <!-- Single Location (Warehouse) -->
+          <div id="editWarehouseContainer" class="hidden relative autocomplete-container">
+            <div class="flex items-center gap-2">
+              <span class="material-icons text-blue-500 text-[18px]">warehouse</span>
+              <input id="editWarehouseSearch" type="text" placeholder="Warehouse Location"
+                class="flex-1 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                oninput="handleEditSearchInput(this, 'warehouse')">
+            </div>
+            <div id="editWarehouseResults"
+              class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+            </div>
+          </div>
+
+          <div id="editRouteControls" class="flex items-center justify-between gap-4 mt-2">
+            <button type="button" onclick="addEditStopInput()"
+              class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 bg-blue-50 text-blue-500 rounded-md">Add
+              Stop</button>
+            <button type="button" onclick="clearEditRouteSearch()"
+              class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 bg-red-50 text-red-500 rounded-md">Clear</button>
+          </div>
+
+          <div class="relative group mt-4">
+            <div id="editRoutePickerMap"
+              class="h-48 bg-slate-100 dark:bg-slate-900 rounded-xl w-full z-0 relative border border-slate-200 dark:border-slate-800 overflow-hidden mb-2">
+            </div>
+            <button type="button" onclick="toggleMapModal('editRoutePickerMap')"
+              class="absolute top-2 right-2 z-[401] bg-white dark:bg-slate-800 p-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-600 dark:text-slate-300">
+              <span class="material-icons text-xs">fullscreen</span> Expand
+            </button>
+          </div>
+
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Location / Route
+            Text</label>
+          <input type="text" id="editSplitLocationInput" readonly
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+        </div>
+
+        <div id="editSplitBaseCostField" class="hidden">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Base Cost (e.g.
+            Petrol)</label>
+          <input type="number" id="editSplitBaseCostInput" step="0.01" min="0" value="0.00"
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+        </div>
+
+        <div id="editSplitDateField" class="hidden">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Availability Date</label>
+          <input type="text" id="editSplitDateInput"
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+        </div>
+
+        <div id="editSplitDetailsField" class="hidden">
+          <label id="editSplitDetailsLabel"
+            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">What Are You Splitting?</label>
+          <input type="text" id="editSplitDetailsInput"
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+        </div>
+        <div class="pt-4">
+          <button type="submit" id="saveEditBtn"
+            class="w-full py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all flex justify-center items-center gap-2">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'http://localhost:3000/api';
     let user = null;
     let allListings = [];
+    let cachedMySplits = [];
     let currentCategory = null;
 
+    // Global fetch wrapper - handles 401 (stale token) by logging out
+    async function apiFetch(url, options = {}) {
+      const token = localStorage.getItem('token');
+      const merged = {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...(options.headers || {})
+        }
+      };
+      const res = await fetch(url, merged);
+      if (res.status === 401) {
+        // Token expired or invalid — clear session and send to login
+        localStorage.clear();
+        window.location.href = 'login.html';
+        throw new Error('Unauthorized');
+      }
+      return res;
+    }
+
     // --- Initialization ---
-    document.addEventListener('DOMContentLoaded', () => {
+    async function checkSessionSync() {
+      try {
+        const res = await fetch(`${API_URL}/sys/session`);
+        const data = await res.json();
+        const storedSessionId = localStorage.getItem('server_session_id');
+
+        if (storedSessionId && storedSessionId !== data.sessionId) {
+          // Server restarted, force logout
+          localStorage.clear();
+          window.location.href = 'index.html';
+          return false;
+        }
+        localStorage.setItem('server_session_id', data.sessionId);
+        return true;
+      } catch (err) {
+        console.error("Session sync check failed", err);
+        return true;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const syncOk = await checkSessionSync();
+      if (!syncOk) return;
+
       const token = localStorage.getItem('token');
       user = JSON.parse(localStorage.getItem('user'));
 
@@ -472,13 +792,76 @@
       document.getElementById('menuUserName').innerText = user.name;
       document.getElementById('menuUserEmail').innerText = user.email;
 
+      initRealTime(user.id);
       refreshDashboard();
     });
+
+    // --- Real-Time (Socket.IO) ---
+    let socket;
+    function initRealTime(userId) {
+      socket = io('http://localhost:3000');
+      
+      socket.on('connect', () => {
+        console.log('[SOCKET] Connected as', socket.id);
+        socket.emit('join', userId);
+      });
+
+      socket.on('order_update', (data) => {
+        console.log('[SOCKET] Order Update Received:', data);
+        showUpdateAlert(data);
+        refreshDashboard();
+        
+        // Highlight tracking tab
+        document.getElementById('trackingDot').classList.remove('hidden');
+      });
+    }
+
+    function showUpdateAlert(data) {
+      // Basic toast/alert for status change
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-24 right-8 z-[200] bg-blue-600 text-white px-6 py-4 rounded-2xl shadow-2xl animate-in slide-in-from-right duration-500';
+      toast.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined">notifications_active</span>
+          <div>
+            <p class="text-xs font-bold uppercase opacity-80">Order Update</p>
+            <p class="text-sm font-bold">Order #${data.orderId} is now ${data.status.replace(/_/g, ' ')}</p>
+            ${data.eta ? `<p class="text-[10px] mt-1 font-medium bg-white/20 px-2 py-0.5 rounded-full inline-block">ETA: ${data.eta}</p>` : ''}
+          </div>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('animate-out', 'fade-out', 'slide-out-to-right');
+        setTimeout(() => toast.remove(), 500);
+      }, 5000);
+    }
+
+    function switchSidebarTab(tab) {
+      const splitsBtn = document.getElementById('tab-side-splits');
+      const trackingBtn = document.getElementById('tab-side-tracking');
+      const splitsContent = document.getElementById('side-splits-content');
+      const trackingContent = document.getElementById('side-tracking-content');
+
+      if (tab === 'splits') {
+        splitsBtn.className = 'text-xs font-black uppercase tracking-wider text-primary border-b-2 border-primary pb-2';
+        trackingBtn.className = 'text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1';
+        splitsContent.classList.remove('hidden');
+        trackingContent.classList.add('hidden');
+      } else {
+        trackingBtn.className = 'text-xs font-black uppercase tracking-wider text-primary border-b-2 border-primary pb-2';
+        splitsBtn.className = 'text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1';
+        trackingContent.classList.remove('hidden');
+        splitsContent.classList.add('hidden');
+        document.getElementById('trackingDot').classList.add('hidden');
+      }
+    }
 
     async function refreshDashboard() {
       await fetchListings();
       await fetchJoinedSplits();
       await fetchStats();
+      await fetchPaymentHistory();
     }
 
     // --- Data Fetching ---
@@ -495,28 +878,17 @@
         digitalCont.innerHTML = '';
         customCont.innerHTML = '';
 
-        // Only show up to 2 items in category containers
-        const counts = { logistics: 0, digital: 0, custom: 0 };
-
         allListings.forEach(l => {
           if (!l.approved) return;
+          if (l.provider_id === user.id) return; // Hide self-created splits
 
           const html = createListingHTML(l);
           if (['cargo_split', 'cold_storage', 'warehouse'].includes(l.type)) {
-            if (counts.logistics < 2) {
-              logisticsCont.insertAdjacentHTML('beforeend', html);
-              counts.logistics++;
-            }
+            logisticsCont.insertAdjacentHTML('beforeend', html);
           } else if (l.type === 'digital_subscriptions') {
-            if (counts.digital < 2) {
-              digitalCont.insertAdjacentHTML('beforeend', html);
-              counts.digital++;
-            }
+            digitalCont.insertAdjacentHTML('beforeend', html);
           } else {
-            if (counts.custom < 2) {
-              customCont.insertAdjacentHTML('beforeend', html);
-              counts.custom++;
-            }
+            customCont.insertAdjacentHTML('beforeend', html);
           }
         });
 
@@ -550,7 +922,20 @@
                         </div>
                         <div>
                             <h3 class="font-bold capitalize leading-tight group-hover:text-primary transition-colors">${title}</h3>
-                            <p class="text-xs text-slate-500 mt-1">${l.location || 'Remote'}</p>
+                            <div class="flex flex-col gap-0.5 mt-1">
+                                <p class="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <span class="material-icons text-[10px]">location_on</span>
+                                    ${l.location || 'Remote'}
+                                </p>
+                                ${['cargo_split', 'cold_storage', 'warehouse'].includes(l.type) && l.date ? `
+                                <p class="text-[10px] text-primary font-bold flex items-center gap-1">
+                                    <span class="material-icons text-[10px]">event</span>
+                                    Available: ${l.date.split(',').map(d => {
+        const dt = new Date(d.trim());
+        return dt.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+      }).join(', ')}
+                                </p>` : ''}
+                            </div>
                         </div>
                     </div>
                     <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-bold">
@@ -573,28 +958,43 @@
 
     async function fetchJoinedSplits() {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/bookings`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await apiFetch(`${API_URL}/bookings/all-joined`);
+        if (!res.ok) {
+          console.error('Failed to fetch joined splits:', res.status);
+          return;
+        }
         const bookings = await res.json();
 
         const cont = document.getElementById('joinedSplitsContainer');
+        const trackingCont = document.getElementById('liveTrackingList');
         cont.innerHTML = '';
+        trackingCont.innerHTML = '';
 
         let activeCount = 0;
+        let trackingCount = 0;
+
         bookings.forEach(b => {
           if (b.status !== 'cancelled') {
-            activeCount++;
-            cont.insertAdjacentHTML('beforeend', createJoinedSplitHTML(b));
+            // If it's a standard split or a confirmed booking we treat as "Split Membership"
+            if (b.entry_type === 'split' || b.status === 'confirmed') {
+              activeCount++;
+              cont.insertAdjacentHTML('beforeend', createJoinedSplitHTML(b));
+            } 
+            
+            // If it has tracking statuses, show in Tracking Tab
+            if (['processing', 'shipped', 'out_for_delivery', 'delivered'].includes(b.status)) {
+              trackingCount++;
+              trackingCont.insertAdjacentHTML('beforeend', createTrackingItemHTML(b));
+            }
           }
         });
 
         document.getElementById('totalJoinedCount').innerText = `${activeCount} Active`;
         if (activeCount === 0) cont.innerHTML = '<p class="text-center py-12 text-slate-500 text-sm">No joined splits yet.</p>';
+        if (trackingCount === 0) trackingCont.innerHTML = '<div class="text-center py-12 text-slate-500 text-sm italic">No active orders to track.</div>';
 
       } catch (err) {
-        console.error(err);
+        if (err.message !== 'Unauthorized') console.error(err);
       }
     }
 
@@ -624,10 +1024,26 @@
                         <span class="text-slate-500">Date</span>
                         <span class="font-bold text-primary">${b.date}</span>
                     </div>
+                    ${(b.payment_status === 'unpaid' && parseFloat(b.total_price) > 0 && b.details?.payment_enabled !== false) ? `
+                    <div class="flex justify-between text-xs">
+                        <span class="text-rose-500 font-bold">Amount Due</span>
+                        <span class="font-bold text-rose-500">₹${parseFloat(b.total_price).toFixed(2)}</span>
+                    </div>
+                    <button onclick="payForBooking('${b.id}', ${b.total_price})" class="w-full py-2 bg-primary text-white rounded-xl text-[10px] font-bold hover:bg-primary/90 transition-colors mt-2 mb-2">
+                        Pay Now ⚡
+                    </button>
+                    ` : `
                     <div class="flex justify-between text-xs">
                         <span class="text-slate-500">Total Paid</span>
                         <span class="font-bold">₹${parseFloat(b.total_price).toFixed(2)}</span>
                     </div>
+                    `}
+                    ${b.confirmation_id ? `
+                    <div class="flex justify-between text-xs bg-slate-100 dark:bg-slate-800 p-2 rounded-lg mt-2">
+                        <span class="text-slate-500 uppercase tracking-wider text-[9px] font-bold self-center">Payment ID</span>
+                        <span class="font-mono font-medium text-slate-800 dark:text-slate-300 text-[10px]">${b.confirmation_id}</span>
+                    </div>
+                    ` : ''}
                     
                     ${isRequested ?
           `<div class="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 p-2 rounded-xl text-[10px] font-bold text-center">
@@ -642,14 +1058,249 @@
         `;
     }
 
+    function createTrackingItemHTML(b) {
+      const statuses = ['confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered'];
+      const currentIndex = statuses.indexOf(b.status);
+      
+      const stepperHTML = statuses.map((s, i) => {
+        let stateClass = '';
+        let icon = 'radio_button_unchecked';
+        if (i < currentIndex) { 
+          stateClass = 'step-completed'; 
+          icon = 'check_circle';
+        } else if (i === currentIndex) {
+          stateClass = 'step-active';
+          icon = 'pending';
+        }
+        
+        return `
+          <div class="step-item relative flex items-start gap-4 pb-6 last:pb-0 ${stateClass}">
+            <div class="step-line"></div>
+            <div class="step-icon w-8 h-8 rounded-full border-2 border-slate-200 bg-white flex items-center justify-center z-10 transition-all">
+              <span class="material-symbols-outlined text-sm font-bold">${icon}</span>
+            </div>
+            <div class="pt-1">
+              <p class="text-[10px] font-black uppercase tracking-widest">${s.replace(/_/g, ' ')}</p>
+              ${i === currentIndex && b.eta ? `<p class="text-[9px] font-bold text-primary mt-0.5">ETA: ${b.eta}</p>` : ''}
+              ${i === currentIndex ? `<p class="text-[8px] text-slate-400 mt-0.5">Last updated: ${new Date(b.updated_at || b.created_at).toLocaleTimeString()}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h4 class="font-black text-slate-900 dark:text-white uppercase tracking-tight text-sm">${b.type.replace(/_/g, ' ')}</h4>
+              <p class="text-[10px] text-slate-500 font-bold">Order #${b.id}</p>
+            </div>
+            <span class="text-[9px] font-black bg-blue-600 text-white px-2 py-1 rounded-lg uppercase">${b.status.replace(/_/g, ' ')}</span>
+          </div>
+          
+          <div class="relative pl-1">
+            ${stepperHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    async function payForBooking(bookingId, amount) {
+      try {
+        const paymentResult = await PaymentSystem.initiate({
+          booking_id: bookingId,
+          amount: amount,
+          method: 'UPI_QR'
+        });
+
+        PaymentSystem.showModal({
+          paymentId: paymentResult.paymentId,
+          confirmationId: paymentResult.confirmationId,
+          qrCodeData: paymentResult.qrCodeData,
+          amount: amount
+        }, async (confirmedData) => {
+          alert("Payment Successful! Reference ID: " + confirmedData.confirmationId);
+          fetchJoinedSplits();
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Payment initiation failed: " + err.message);
+      }
+    }
+
     async function fetchStats() {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/stats`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      try {
+        const res = await apiFetch(`${API_URL}/stats`);
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('consumerAmountSaved').innerText = `₹${parseFloat(data.amount_saved).toFixed(2)}`;
+        document.getElementById('consumerActiveSplits').innerText = data.active_splits;
+      } catch (err) {
+        if (err.message !== 'Unauthorized') console.error(err);
+      }
+    }
+
+    async function fetchPaymentHistory() {
+      try {
+        const res = await apiFetch(`${API_URL}/payments/user/history`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cont = document.getElementById('paymentsContainer');
+        if (!cont) return; // Payment History section was removed
+        cont.innerHTML = '';
+
+        if (!data.payments || data.payments.length === 0) {
+          cont.innerHTML = '<p class="text-center py-12 text-slate-500 text-sm">No payment history yet.</p>';
+          return;
+        }
+
+        data.payments.forEach(p => {
+          const statusColor = p.status === 'completed' ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'text-amber-500 bg-amber-50 dark:bg-amber-900/30';
+          const html = `
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center hover:border-primary transition-all mb-3 shadow-sm">
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white capitalize">${p.item_title || 'Payment'}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs text-slate-500 font-mono" title="Confirmation ID">${p.confirmation_id}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${statusColor}">${p.status.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-black text-slate-900 dark:text-white text-lg">₹${parseFloat(p.payment_amount).toFixed(2)}</p>
+                        <p class="text-[10px] text-slate-400">${new Date(p.created_at).toLocaleDateString()} ${new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                </div>
+            `;
+          cont.insertAdjacentHTML('beforeend', html);
+        });
+      } catch (err) {
+        console.error("Error fetching payment history:", err);
+      }
+    }
+
+    // --- Savings Analytics Logic ---
+    let savingsChartInstance = null;
+
+    async function openSavingsAnalytics() {
+      const modal = document.getElementById('savingsAnalyticsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/stats/savings-history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        renderSavingsChart(data.graphData);
+        renderSavingsHistoryList(data.history);
+      } catch (err) {
+        console.error("Failed to load savings history", err);
+      }
+    }
+
+    function closeSavingsAnalytics() {
+      const modal = document.getElementById('savingsAnalyticsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderSavingsChart(graphData) {
+      const ctx = document.getElementById('savingsChart').getContext('2d');
+      if (savingsChartInstance) savingsChartInstance.destroy();
+
+      const labels = graphData.map(d => d.month);
+      const values = graphData.map(d => d.amount);
+
+      savingsChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Amount Saved',
+            data: values,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 4,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#3B82F6',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1E293B',
+              padding: 12,
+              titleFont: { size: 10, weight: 'bold' },
+              bodyFont: { size: 14, weight: 'black' },
+              callbacks: {
+                label: (context) => ` ₹${context.parsed.y.toFixed(2)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { display: false },
+              ticks: { 
+                font: { size: 10, weight: 'bold' },
+                color: '#94A3B8',
+                callback: (val) => '₹' + val
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { 
+                font: { size: 10, weight: 'bold' },
+                color: '#94A3B8'
+              }
+            }
+          }
+        }
       });
-      const data = await res.json();
-      document.getElementById('consumerAmountSaved').innerText = `₹${parseFloat(data.amount_saved).toFixed(2)}`;
-      document.getElementById('consumerActiveSplits').innerText = data.active_splits;
+    }
+
+    function renderSavingsHistoryList(history) {
+      const cont = document.getElementById('savingsSummaryList');
+      if (history.length === 0) {
+        cont.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">No savings recorded yet.</div>';
+        return;
+      }
+
+      cont.innerHTML = history.map(h => {
+        const date = h.date ? new Date(h.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recurring';
+        const typeColor = h.type === 'Split Shared' ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20';
+        
+        return `
+          <div class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                <span class="material-symbols-outlined text-slate-400">${h.type === 'Split Shared' ? 'share' : 'person_add'}</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white capitalize">${h.item}</h4>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold ${typeColor}">${h.type.toUpperCase()}</span>
+                  <span class="text-[10px] text-slate-400 font-medium">${date}</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-black text-slate-900 dark:text-white text-sm">₹${h.amount.toFixed(2)}</p>
+              <p class="text-[9px] text-emerald-500 font-bold">Saved</p>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // --- Booking Logic ---
@@ -690,9 +1341,34 @@
         });
         const data = await res.json();
         if (res.ok) {
-          alert("Booking successful!");
-          closeUniversalBookingModal();
-          refreshDashboard();
+          const booking = data.booking;
+          const paymentRequired = data.payment_required;
+          const amount = parseFloat(booking.total_price);
+
+          // If the booking requires payment (> 0) AND the provider enabled payments
+          if (paymentRequired && amount > 0) {
+            const paymentResult = await PaymentSystem.initiate({
+              booking_id: booking.id,
+              amount: amount,
+              method: 'UPI_QR'
+            });
+
+            PaymentSystem.showModal({
+              paymentId: paymentResult.paymentId,
+              confirmationId: paymentResult.confirmationId,
+              qrCodeData: paymentResult.qrCodeData,
+              amount: amount
+            }, async (confirmedData) => {
+              alert("Booking and Payment Successful! Reference ID: " + confirmedData.confirmationId);
+              closeUniversalBookingModal();
+              refreshDashboard();
+            });
+          } else {
+            // Free booking bypasses payment
+            alert("Booking successful!");
+            closeUniversalBookingModal();
+            refreshDashboard();
+          }
         } else {
           alert(data.message);
         }
@@ -759,21 +1435,88 @@
         detailsLabel.innerText = 'Subscription Plan / Info';
         detailsInp.placeholder = 'e.g. 4K Ultra HD + Mobile';
         categoryFields.innerHTML = `
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Name</label>
-                <input type="text" id="splitService" required class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm mb-4" placeholder="e.g. Netflix">
+                <div class="mb-4">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Name</label>
+                  <input type="text" id="splitService" required class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm" placeholder="e.g. Netflix">
+                </div>
+                <div class="mb-4">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Subscription Cost (₹)</label>
+                  <input type="number" id="splitTotalCost" min="1" step="0.01" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm" placeholder="e.g. 1000.00">
+                </div>
             `;
+
+
+        const priceContainer = document.getElementById('priceSlotContainer');
+        const capacityGrid = document.getElementById('capacityPriceGrid');
+        priceContainer.classList.remove('hidden');
+        capacityGrid.classList.value = 'grid grid-cols-2 gap-4';
+
+        // Auto-calculate logic
+        document.getElementById('splitPrice').readOnly = true;
+        document.getElementById('splitPrice').classList.add('opacity-70', 'cursor-not-allowed', 'bg-slate-100', 'dark:bg-slate-800');
+        document.getElementById('splitPrice').required = true;
+
+        const autoCalc = () => {
+          const total = parseFloat(document.getElementById('splitTotalCost').value) || 0;
+          const slots = parseInt(document.getElementById('splitCapacity').value) || 1;
+          if (slots > 0) {
+            document.getElementById('splitPrice').value = (Math.ceil((total / slots) * 100) / 100).toFixed(2);
+          }
+        };
+
+        document.getElementById('splitTotalCost').addEventListener('input', autoCalc);
+        document.getElementById('splitCapacity').addEventListener('input', autoCalc);
       } else {
         title.innerText = 'Custom Split Details';
         detailsLabel.innerText = 'What are you splitting?';
         detailsInp.placeholder = 'e.g. Weekly Turf Booking at Mumbai';
         categoryFields.innerHTML = `
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
-                <select id="customType" required class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm mb-4">
-                    <option value="sports">Sports & Recreation</option>
-                    <option value="travel">Travel Share</option>
-                    <option value="other">Other Community Split</option>
-                </select>
+                <div class="mb-4">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
+                  <select id="customType" required class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm">
+                      <option value="sports">Sports & Recreation</option>
+                      <option value="travel">Travel Share</option>
+                      <option value="other">Other Community Split</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl mb-4">
+                    <div>
+                        <h5 class="text-sm font-bold text-slate-900 dark:text-white">Require Payment via UNIO</h5>
+                        <p class="text-[10px] text-slate-500">Collect split amounts automatically</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="splitPaymentEnabled" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                    </label>
+                </div>
             `;
+
+        // Reset readOnly and set listeners for the toggle
+        const priceInp = document.getElementById('splitPrice');
+        const priceContainer = document.getElementById('priceSlotContainer');
+        const capacityGrid = document.getElementById('capacityPriceGrid');
+
+        priceInp.readOnly = false;
+        priceInp.classList.remove('opacity-70', 'cursor-not-allowed', 'bg-slate-100', 'dark:bg-slate-800');
+        priceInp.value = ''; // clear any auto-calc
+        const toggle = document.getElementById('splitPaymentEnabled');
+        if (toggle) {
+          toggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              priceContainer.classList.remove('hidden');
+              capacityGrid.classList.value = 'grid grid-cols-2 gap-4';
+              priceInp.required = true;
+              if (priceInp.value === '0') priceInp.value = '';
+            } else {
+              priceContainer.classList.add('hidden');
+              capacityGrid.classList.value = 'grid grid-cols-1 gap-4';
+              priceInp.required = false;
+              priceInp.value = '0';
+            }
+          });
+          // Set initial state
+          toggle.dispatchEvent(new Event('change'));
+        }
       }
     }
 
@@ -795,7 +1538,8 @@
         price_per_unit: document.getElementById('splitPrice').value,
         details: {
           app: type === 'digital_subscriptions' ? document.getElementById('splitService').value : document.getElementById('splitDetails').value,
-          info: document.getElementById('splitDetails').value
+          info: document.getElementById('splitDetails').value,
+          payment_enabled: document.getElementById('splitPaymentEnabled') ? document.getElementById('splitPaymentEnabled').checked : true
         },
         location: type === 'digital_subscriptions' ? 'Remote' : 'Local/Community',
         date: 'Recurring',
@@ -815,8 +1559,12 @@
           closeCustomSplitModal();
           fetchListings();
         } else {
-          const err = await res.json();
-          alert("Failed: " + err.message);
+          try {
+            const err = await res.json();
+            alert("Failed: " + err.message);
+          } catch (e) {
+            alert("Failed: " + res.statusText);
+          }
         }
       } catch (error) {
         console.error(error);
@@ -962,10 +1710,647 @@
       renderExtendedGrid(filtered);
     }
 
+    // --- AI Assistant Logic ---
+    let isAIChatOpen = false;
+
+    function toggleAIChat() {
+      const chat = document.getElementById('aiAssistantChat');
+      const isOpen = chat.classList.toggle('hidden');
+      if (!isOpen) { 
+          chat.classList.add('active'); 
+          isAIChatOpen = true; 
+          // Initialize chatbot flow if it's the first time
+          if (document.getElementById('aiMessageArea').children.length === 0) {
+              interactChatbot('main_menu');
+          }
+      } else { 
+          chat.classList.remove('active'); 
+          isAIChatOpen = false; 
+      }
+    }
+
+    function addAIMessage(role, text) {
+      const chatArea = document.getElementById('aiMessageArea');
+      const div = document.createElement('div');
+      div.className = `flex flex-col gap-1 max-w-[80%] animate-in fade-in slide-in-from-bottom-2 ${role === 'user' ? 'self-end ml-auto' : ''}`;
+
+      let msgHtml = '';
+      // Convert basic markdown (like **bold**) to HTML
+      const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+      if (role === 'user') {
+        msgHtml = `<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-none text-sm shadow-sm">${formattedText}</div>
+                   <span class="text-[9px] text-slate-400 mr-1 self-end">You • Just now</span>`;
+      } else {
+        msgHtml = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none text-sm shadow-sm">${formattedText}</div>
+                   <span class="text-[9px] text-slate-400 ml-1">Assistant • Just now</span>`;
+      }
+
+      div.innerHTML = msgHtml;
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function renderChatbotOptions(options) {
+        const optionsArea = document.getElementById('aiOptionsArea');
+        optionsArea.innerHTML = ''; // clear existing
+        
+        if (!options || options.length === 0) return;
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-primary hover:bg-blue-50 dark:hover:bg-slate-800 transition-all shadow-sm";
+            btn.innerText = opt.label;
+            btn.onclick = () => {
+                addAIMessage('user', opt.label);
+                // Temporarily disable buttons until response
+                optionsArea.innerHTML = '<div class="text-center text-xs text-slate-400 py-2 animate-pulse">Thinking...</div>';
+                interactChatbot(opt.next, opt.context);
+            };
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    async function interactChatbot(node_id, context = {}) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                addAIMessage('assistant', "Hello! I am the UNIO AI Assistant. Please log in or sign up above to track your orders, check your trust score, and manage your splits!");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/chatbot/interact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ node_id, context })
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                addAIMessage('assistant', "Your session has expired. Please log in again to continue.");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            if (!res.ok) throw new Error("Failed to fetch next step");
+
+            const data = await res.json();
+            
+            // Allow a tiny delay for natural feel
+            setTimeout(() => {
+                addAIMessage('assistant', data.message);
+                renderChatbotOptions(data.options);
+            }, 400);
+
+            if (node_id === 'close_chat') {
+                setTimeout(() => toggleAIChat(), 1500);
+            }
+        } catch (err) {
+            console.error("Chatbot Error:", err);
+            addAIMessage('assistant', "Sorry, I lost connection to the server. Let's restart.");
+            renderChatbotOptions([{ label: "Restart Chat", next: "main_menu" }]);
+        }
+    }
+
+    // --- Category Slider Logic ---
+    let currentSlideIndex = 0;
+    const slides = ['logistics', 'digital', 'custom'];
+
+    function switchCategory(category) {
+      const index = slides.indexOf(category);
+      if (index === -1) return;
+      currentSlideIndex = index;
+
+      // Update slider position
+      const slider = document.getElementById('sectionsSlider');
+      slider.style.transform = `translateX(-${index * 100}%)`;
+
+      // Update Tabs
+      slides.forEach(s => {
+        const tab = document.getElementById(`tab-${s}`);
+        const dot = document.getElementById(`dot-${s}`);
+        if (s === category) {
+          tab.classList.remove('opacity-50');
+          tab.classList.add('opacity-100');
+          dot.classList.remove('bg-slate-200', 'dark:bg-slate-700');
+          dot.classList.add('bg-primary');
+        } else {
+          tab.classList.add('opacity-50');
+          tab.classList.remove('opacity-100');
+          dot.classList.remove('bg-primary');
+          dot.classList.add('bg-slate-200', 'dark:bg-slate-700');
+        }
+      });
+
+      // Update actions
+      const actions = document.getElementById('categoryActions');
+      if (category === 'logistics') {
+        actions.classList.remove('hidden');
+      } else {
+        actions.classList.add('hidden');
+      }
+    }
+
+    // Touch swipe support
+    document.addEventListener('DOMContentLoaded', () => {
+      const sliderContainer = document.getElementById('sectionsSlider');
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      if (sliderContainer) {
+        sliderContainer.addEventListener('touchstart', e => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        sliderContainer.addEventListener('touchend', e => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { passive: true });
+      }
+
+      function handleSwipe() {
+        const minSwipeDistance = 40;
+        if (touchStartX - touchEndX > minSwipeDistance) {
+          // Swiped left
+          if (currentSlideIndex < slides.length - 1) {
+            switchCategory(slides[currentSlideIndex + 1]);
+          }
+        } else if (touchEndX - touchStartX > minSwipeDistance) {
+          // Swiped right
+          if (currentSlideIndex > 0) {
+            switchCategory(slides[currentSlideIndex - 1]);
+          }
+        }
+      }
+    });
+
     // Call notifications periodically
     setInterval(fetchNotifications, 10000);
     fetchNotifications();
+
+    // --- Manage Splits Logic ---
+    function openManageSplitsModal() {
+      document.getElementById('manageSplitsModal').classList.remove('hidden');
+      fetchMySplits();
+    }
+
+    function closeManageSplitsModal() {
+      document.getElementById('manageSplitsModal').classList.add('hidden');
+    }
+
+    async function fetchMySplits() {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/listings/my`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const mySplits = await res.json();
+        cachedMySplits = mySplits; // Cache for editing
+        const container = document.getElementById('manageSplitsContainer');
+
+        if (mySplits.length === 0) {
+          container.innerHTML = '<p class="text-center py-12 text-slate-500">You haven\\\'t created any splits yet.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        mySplits.forEach(s => {
+          const title = s.details?.app || s.details?.activity || s.type.replace(/_/g, ' ');
+          const html = `
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl mb-4 border border-slate-100 dark:border-slate-800 flex justify-between items-center group">
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white capitalize">${title}</h4>
+                            <p class="text-xs text-slate-500 mt-1">${s.capacity} • ₹${s.price_per_unit}/unit • ${s.location || 'Remote'}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editMySplit('${s.id}')" class="p-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-primary hover:text-white transition-colors" title="Edit">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                            <button onclick="deleteMySplit('${s.id}')" class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors" title="Delete">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+          container.insertAdjacentHTML('beforeend', html);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteMySplit(id) {
+      if (!confirm("Are you sure you want to delete this split? This cannot be undone.")) return;
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/listings/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          fetchMySplits();
+          fetchStats(); // Update active split count
+        } else {
+          alert("Failed to delete split. It may already be booked.");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function closeEditSplitModal() {
+      document.getElementById('editSplitModal').classList.add('hidden');
+      document.getElementById('editSplitModal').classList.remove('flex');
+    }
+
+    async function getNearestCity(lat, lng) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await res.json();
+        return data.address.city || data.address.town || data.address.village || data.address.state || `Point (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+      } catch {
+        return `Point (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+      }
+    }
+
+    let editRouteMap;
+    let editRouteMarkers = { start: null, end: null, stops: [] };
+    let editRoutePolyline;
+    let editRoutePoints = { start: null, end: null, stops: [] };
+    let editSearchTimeout;
+
+    function getLabeledIcon(label, colorClass = 'bg-primary') {
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `<div class="flex items-center justify-center w-7 h-7 rounded-full border-2 border-white shadow-xl ${colorClass} text-white text-[12px] font-black">${label}</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+      });
+    }
+
+    function getActivePoints(src) {
+      const points = [];
+      const labels = [];
+      let charCode = 65;
+      if (src.start) { points.push(src.start); labels.push(String.fromCharCode(charCode++)); }
+      src.stops.forEach(p => { if (p) { points.push(p); labels.push(String.fromCharCode(charCode++)); } });
+      if (src.end) { points.push(src.end); labels.push(String.fromCharCode(charCode++)); }
+      return { points, labels };
+    }
+
+    let expandedMap;
+    function toggleMapModal(sourceId) {
+      const modal = document.getElementById('mapExpansionModal');
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      setTimeout(() => {
+        if (!expandedMap) {
+          expandedMap = L.map('expandedMapContainer', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(expandedMap);
+        }
+        syncEditMapUI(expandedMap);
+        setTimeout(() => expandedMap.invalidateSize(), 200);
+      }, 300);
+    }
+    function closeMapModal() { document.getElementById('mapExpansionModal').classList.add('hidden'); document.getElementById('mapExpansionModal').classList.remove('flex'); }
+
+    function editMySplit(id) {
+      const s = cachedMySplits.find(x => x.id == id);
+      if (!s) return;
+
+      document.getElementById('editSplitId').value = s.id;
+      document.getElementById('editSplitType').value = s.type;
+
+      // Reset visibilities
+      const logisticsTypes = ['cargo_split', 'cold_storage', 'warehouse'];
+      const isLogistics = logisticsTypes.includes(s.type);
+      const isDigital = s.type === 'digital_subscriptions';
+
+      if (isLogistics) {
+        window.location.href = `provider.html?edit_listing_id=${s.id}`;
+        return;
+      }
+
+      document.getElementById('editCategoryField').classList.remove('hidden');
+      document.getElementById('editSplitLocationField').classList.toggle('hidden', !isLogistics);
+      document.getElementById('editSplitBaseCostField').classList.toggle('hidden', !isLogistics);
+      document.getElementById('editSplitDateField').classList.toggle('hidden', !isLogistics);
+      document.getElementById('editSplitDetailsField').classList.toggle('hidden', isLogistics);
+
+      if (isLogistics) {
+        const isWarehouse = s.type === 'warehouse';
+        document.getElementById('editModalContentTitle').innerText = isWarehouse ? 'Edit Warehouse Listing' : 'Edit Space Listing';
+        document.getElementById('editSplitNameLabel').innerText = 'Resource Type';
+        document.getElementById('editSplitCapacityLabel').innerText = 'Capacity';
+        document.getElementById('editSplitName').value = s.type.replace(/_/g, ' ');
+        document.getElementById('editSplitCategory').value = 'Space Optimization';
+
+        document.getElementById('editSplitLocationInput').value = s.location || '';
+        document.getElementById('editSplitBaseCostInput').value = s.base_cost || 0.00;
+        document.getElementById('editSplitDateInput').value = s.date || '';
+
+        document.getElementById('editRouteInputsContainer').classList.toggle('hidden', isWarehouse);
+        document.getElementById('editRouteControls').classList.toggle('hidden', isWarehouse);
+        document.getElementById('editWarehouseContainer').classList.toggle('hidden', !isWarehouse);
+
+        editRoutePoints = s.details?.route_full
+          ? JSON.parse(JSON.stringify(s.details.route_full))
+          : { start: null, end: null, stops: [] };
+
+        // Populate Search Inputs
+        if (isWarehouse) {
+          document.getElementById('editWarehouseSearch').value = editRoutePoints.start?.name || '';
+        } else {
+          document.getElementById('editStartSearch').value = editRoutePoints.start?.name || '';
+          document.getElementById('editEndSearch').value = editRoutePoints.end?.name || '';
+          const stopsContainer = document.getElementById('editStopsInputsContainer');
+          stopsContainer.innerHTML = '';
+          editRoutePoints.stops.forEach((p, i) => { if (p) addEditStopInput(i, p.name); });
+        }
+
+        setTimeout(() => {
+          if (!editRouteMap) {
+            editRouteMap = L.map('editRoutePickerMap', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(editRouteMap);
+          }
+          syncEditMapUI();
+          setTimeout(() => editRouteMap.invalidateSize(), 200);
+        }, 300);
+
+      } else if (isDigital) {
+        document.getElementById('editModalContentTitle').innerText = 'Edit Digital Split';
+        document.getElementById('editSplitNameLabel').innerText = 'Service Name';
+        document.getElementById('editSplitCapacityLabel').innerText = 'Total Slots';
+        document.getElementById('editSplitDetailsLabel').innerText = 'Subscription Plan / Info';
+        document.getElementById('editSplitCategory').value = 'Digital Subscription';
+
+        document.getElementById('editSplitName').value = s.details?.app || '';
+        document.getElementById('editSplitDetailsInput').value = s.details?.info || '';
+      } else {
+        document.getElementById('editModalContentTitle').innerText = 'Edit Custom Split';
+        document.getElementById('editSplitNameLabel').innerText = 'Split Name';
+        document.getElementById('editSplitCapacityLabel').innerText = 'Total Slots';
+        document.getElementById('editSplitDetailsLabel').innerText = 'What Are You Splitting?';
+        document.getElementById('editSplitCategory').value = s.type.charAt(0).toUpperCase() + s.type.slice(1);
+
+        document.getElementById('editSplitName').value = s.details?.app || s.details?.activity || '';
+        document.getElementById('editSplitDetailsInput').value = s.details?.info || '';
+      }
+
+      document.getElementById('editSplitCapacity').value = s.capacity;
+      document.getElementById('editSplitPrice').value = s.price_per_unit;
+
+      document.getElementById('editSplitModal').classList.remove('hidden');
+      document.getElementById('editSplitModal').classList.add('flex');
+    }
+
+    function handleEditSearchInput(input, type, index = null) {
+      clearTimeout(editSearchTimeout);
+      const query = input.value;
+      const resultsDiv = index !== null ? document.getElementById(`editStopResults-${index}`) : document.getElementById(`edit${type.charAt(0).toUpperCase() + type.slice(1)}Results`);
+
+      if (query.length < 3) {
+        resultsDiv.classList.add('hidden');
+        return;
+      }
+
+      editSearchTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+          const data = await res.json();
+          showEditSearchResults(data, type, resultsDiv, index);
+        } catch (err) {
+          console.error("Search error:", err);
+        }
+      }, 500);
+    }
+
+    function showEditSearchResults(data, type, container, index) {
+      container.innerHTML = '';
+      if (data.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 text-xs';
+        div.innerHTML = `<p class="font-medium text-slate-900 dark:text-white truncate">${item.display_name}</p>`;
+        div.onclick = () => selectEditLocation(item, type, index);
+        container.appendChild(div);
+      });
+    }
+
+    function selectEditLocation(item, type, index) {
+      const lat = parseFloat(item.lat);
+      const lon = parseFloat(item.lon);
+      const name = item.display_name.split(',')[0];
+      const point = { lat, lon, name, fullName: item.display_name };
+
+      if (type === 'start') {
+        editRoutePoints.start = point;
+        document.getElementById('editStartSearch').value = name;
+        document.getElementById('editStartResults').classList.add('hidden');
+      } else if (type === 'end') {
+        editRoutePoints.end = point;
+        document.getElementById('editEndSearch').value = name;
+        document.getElementById('editEndResults').classList.add('hidden');
+      } else if (type === 'stop') {
+        editRoutePoints.stops[index] = point;
+        document.getElementById(`editStopSearch-${index}`).value = name;
+        document.getElementById(`editStopResults-${index}`).classList.add('hidden');
+      } else if (type === 'warehouse') {
+        editRoutePoints.start = point;
+        editRoutePoints.end = point;
+        editRoutePoints.stops = [];
+        document.getElementById('editWarehouseSearch').value = name;
+        document.getElementById('editWarehouseResults').classList.add('hidden');
+      }
+      syncEditMapUI();
+    }
+
+    function addEditStopInput(existingIndex = null, existingName = '') {
+      const index = existingIndex !== null ? existingIndex : editRoutePoints.stops.length;
+      if (existingIndex === null) editRoutePoints.stops.push(null);
+      const container = document.getElementById('editStopsInputsContainer');
+      const html = `
+        <div class="relative autocomplete-container" id="editStopRow-${index}">
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-blue-500 text-[18px]">pause_circle_filled</span>
+            <input id="editStopSearch-${index}" type="text" placeholder="Stop" value="${existingName}"
+                   class="flex-1 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-2.5 text-xs focus:ring-2 focus:ring-primary outline-none transition-all"
+                   oninput="handleEditSearchInput(this, 'stop', ${index})">
+            <button type="button" onclick="removeEditStopInput(${index})" class="text-slate-400 hover:text-red-500">
+              <span class="material-icons text-base">remove_circle_outline</span>
+            </button>
+          </div>
+          <div id="editStopResults-${index}" class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto"></div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeEditStopInput(index) {
+      document.getElementById(`editStopRow-${index}`).remove();
+      editRoutePoints.stops[index] = undefined;
+      syncEditMapUI();
+    }
+
+    function syncEditMapUI(targetMap = null) {
+      const activeMap = targetMap || editRouteMap;
+      if (!activeMap) return;
+
+      const { points, labels } = getActivePoints(editRoutePoints);
+      activeMap.eachLayer(layer => { if (layer instanceof L.Marker || layer instanceof L.Polyline) activeMap.removeLayer(layer); });
+
+      const isWarehouse = document.getElementById('editSplitType').value === 'warehouse';
+      const leafletPoints = [];
+      points.forEach((p, i) => {
+        if (isWarehouse && i > 0) return; // Only show one marker for warehouse
+        const colorClass = i === 0 ? 'bg-emerald-500' : (i === points.length - 1 ? 'bg-red-500' : 'bg-blue-500');
+        L.marker([p.lat, p.lon], { icon: getLabeledIcon(labels[i], colorClass) }).addTo(activeMap).bindPopup(`<b>${labels[i]}:</b> ${p.name}`);
+        leafletPoints.push([p.lat, p.lon]);
+      });
+
+      if (leafletPoints.length > 1 && !isWarehouse) {
+        const poly = L.polyline(leafletPoints, { color: '#2563eb', weight: 4, dashArray: '5, 10' }).addTo(activeMap);
+        activeMap.fitBounds(poly.getBounds(), { padding: [30, 30] });
+      } else if (leafletPoints.length === 1) {
+        activeMap.setView(leafletPoints[0], 13);
+      }
+      if (!targetMap) {
+        const names = points.map(p => p.name);
+        document.getElementById('editSplitLocationInput').value = isWarehouse ? names[0] : names.join(" -> ");
+      }
+    }
+
+    function clearEditRouteSearch() {
+      editRoutePoints = { start: null, end: null, stops: [] };
+      document.getElementById('editStartSearch').value = '';
+      document.getElementById('editEndSearch').value = '';
+      document.getElementById('editStopsInputsContainer').innerHTML = '';
+      syncEditMapUI();
+    }
+
+    document.getElementById('editSplitForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('saveEditBtn');
+      const originalText = btn.innerText;
+      btn.innerText = 'Saving...';
+      btn.disabled = true;
+
+      const id = document.getElementById('editSplitId').value;
+      const type = document.getElementById('editSplitType').value;
+
+      const logisticsTypes = ['cargo_split', 'cold_storage', 'warehouse'];
+      const isLogistics = logisticsTypes.includes(type);
+
+      let body = {
+        capacity: document.getElementById('editSplitCapacity').value,
+        price_per_unit: document.getElementById('editSplitPrice').value,
+      };
+
+      if (isLogistics) {
+        body.location = document.getElementById('editSplitLocationInput').value;
+        body.base_cost = document.getElementById('editSplitBaseCostInput').value;
+        body.date = document.getElementById('editSplitDateInput').value;
+        body.details = {
+          route_full: editRoutePoints
+        };
+      } else {
+        body.details = {
+          app: document.getElementById('editSplitName').value,
+          info: document.getElementById('editSplitDetailsInput').value
+        };
+        // For custom splits, app might also be activity
+        body.details.activity = body.details.app;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/listings/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          closeEditSplitModal();
+          fetchMySplits(); // Update list
+        } else {
+          alert("Failed to edit split.");
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+      }
+    });
   </script>
+  <!-- Savings Analytics Modal -->
+  <div id="savingsAnalyticsModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
+          <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+              <div>
+                  <h2 class="text-2xl font-black text-slate-900 dark:text-white">Savings Analytics</h2>
+                  <p class="text-xs text-slate-500 font-medium">Monthly growth and detailed summary</p>
+              </div>
+              <button onclick="closeSavingsAnalytics()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors">
+                  <span class="material-symbols-outlined">close</span>
+              </button>
+          </div>
+          
+          <div class="flex-1 overflow-y-auto p-8 space-y-8 sidebar-scroll">
+              <!-- Graph Section -->
+              <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                  <div class="flex justify-between items-center mb-6">
+                      <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Savings Trend</h3>
+                      <span class="text-[10px] font-black bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-full">+12.5% vs Last Month</span>
+                  </div>
+                  <div class="relative h-[250px] w-full">
+                      <canvas id="savingsChart"></canvas>
+                  </div>
+              </div>
+
+              <!-- Summary List Section -->
+              <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 px-1">Earning Summary</h3>
+                  <div id="savingsSummaryList" class="space-y-3">
+                      <div class="text-center py-10 text-slate-400 text-sm">Loading history...</div>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="p-6 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800">
+              <button onclick="closeSavingsAnalytics()" class="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-primary/20 transition-all">
+                  Dismiss
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Expandable Map Modal -->
+  <div id="mapExpansionModal"
+    class="fixed inset-0 z-[2000] hidden bg-slate-900/90 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl relative">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Expanded Route View</h3>
+        <button onclick="closeMapModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div id="expandedMapContainer" class="h-[70vh] w-full z-0"></div>
+      <div class="p-6 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center">
+        <p class="text-xs text-slate-500 font-medium">Interactive Route Preview (A to Z)</p>
+        <button onclick="closeMapModal()"
+          class="px-6 py-2 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20">Close
+          Preview</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

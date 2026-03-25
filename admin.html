@@ -99,7 +99,7 @@
                                 <th class="px-6 py-4">Booking ID</th>
                                 <th class="px-6 py-4">Service</th>
                                 <th class="px-6 py-4">User</th>
-                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Status & Payment</th>
                                 <th class="px-6 py-4">Date</th>
                                 <th class="px-6 py-4 text-right">Actions</th>
                             </tr>
@@ -251,9 +251,14 @@
                             <div class="text-xs text-slate-500">${b.user_email}</div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(b.status)}">
-                                ${b.status}
-                            </span>
+                            <div class="mb-1">
+                                <span class="px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(b.status)}">
+                                    ${b.status}
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                ${formatPaymentInfo(b)}
+                            </div>
                         </td>
                         <td class="px-6 py-4 text-xs text-slate-500">${new Date(b.created_at).toLocaleDateString()}</td>
                         <td class="px-6 py-4 text-right">
@@ -285,6 +290,24 @@
                 case 'cancelled': return 'bg-slate-100 text-slate-500 line-through';
                 default: return 'bg-slate-100 text-slate-700';
             }
+        }
+
+        function formatPaymentInfo(b) {
+            // Check if it's a split with NO money needed (price <= 0)
+            if (parseFloat(b.price_per_unit || 0) <= 0 && parseFloat(b.base_cost || 0) <= 0) {
+                return '<span class="text-[10px] text-slate-400 font-medium italic"><span class="material-icons text-[12px] align-middle">money_off</span> No Payment Required</span>';
+            }
+            if (b.confirmation_id) {
+                const dpStatusColor = b.dp_status === 'completed' ? 'text-emerald-600' : 'text-amber-500';
+                return `
+                    <div class="text-[10px] bg-slate-50 border border-slate-100 rounded-lg p-2 inline-block">
+                        <span class="text-slate-500 uppercase font-bold tracking-wider">Pay ID:</span> 
+                        <span class="font-mono font-medium text-slate-800">${b.confirmation_id}</span>
+                        <div class="mt-0.5 font-bold uppercase ${dpStatusColor}">${b.dp_status}</div>
+                    </div>
+                `;
+            }
+            return '<span class="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-md uppercase">Unpaid</span>';
         }
 
         async function togglePriority(id) {

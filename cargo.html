@@ -45,6 +45,13 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
         .map-bg {
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 24px 24px;
@@ -53,6 +60,14 @@
             background-image: radial-gradient(#334155 1px, transparent 1px);
         }
     </style>
+    <script>
+        // Check theme on load
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -66,10 +81,10 @@
                 <span class="text-2xl font-bold tracking-tight">UNIO</span>
             </a>
             <div class="hidden md:flex items-center gap-8">
-                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="consumer.html">Dashboard</a>
                 <a class="text-sm font-medium hover:text-primary transition-colors text-primary"
-                    href="#">Marketplace</a>
-                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
+                    href="marketplace.html">Marketplace</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="community.html">Community</a>
             </div>
             <div class="flex items-center gap-4">
                 <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -86,7 +101,8 @@
     </nav>
     <main class="max-w-[1440px] mx-auto px-6 py-8">
         <div class="mb-8 flex items-center gap-4">
-            <button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            <button onclick="window.history.back()"
+                class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                 <span class="material-symbols-outlined">arrow_back</span>
             </button>
             <div>
@@ -95,38 +111,56 @@
                     <span>/</span>
                     <span>Logistics</span>
                     <span>/</span>
-                    <span class="text-primary">Cargo Split</span>
+                    <span class="text-primary" id="listingTypeBreadcrumb">Cargo Split</span>
                 </nav>
-                <h1 class="text-3xl font-bold">Cargo Split Booking</h1>
+                <h1 class="text-3xl font-bold flex items-center gap-3">
+                    <span id="pageTitle">Cargo Split Booking</span>
+                    <span id="headerRoute" class="text-lg font-normal text-slate-400"></span>
+                </h1>
             </div>
         </div>
         <div class="grid lg:grid-cols-12 gap-8">
             <div class="lg:col-span-7 space-y-6">
+                <!-- Route Details (Upgraded to Search Picker) -->
                 <div
                     class="bg-white dark:bg-slate-800 rounded-2xl p-8 card-shadow border border-white dark:border-slate-700">
                     <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">location_on</span>
-                        Route Details
+                        <span class="material-symbols-outlined text-primary">navigation</span>
+                        Route Your Segment
                     </h2>
                     <div class="space-y-6">
-                        <div
-                            class="relative pb-6 border-l-2 border-dashed border-slate-200 dark:border-slate-700 ml-4 pl-8">
+                        <!-- Pickup Search -->
+                        <div class="relative autocomplete-container">
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Pickup Address (on provider's
+                                route)</label>
                             <div
-                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white dark:bg-slate-800 border-2 border-primary">
+                                class="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary transition-all">
+                                <span class="material-icons text-emerald-500 text-lg">trip_origin</span>
+                                <input id="pickupSearch"
+                                    class="flex-1 bg-transparent border-none p-0 focus:ring-0 text-sm"
+                                    placeholder="Search pickup location..." type="text"
+                                    oninput="handleSearchInput(this, 'pickup')" />
                             </div>
-                            <label class="block text-sm font-semibold text-slate-500 mb-2">Pickup Address</label>
-                            <input
-                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
-                                placeholder="Enter collection point" type="text" />
+                            <div id="pickupResults"
+                                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+                            </div>
                         </div>
-                        <div class="relative ml-4 pl-8">
+
+                        <!-- Delivery Search -->
+                        <div class="relative autocomplete-container">
+                            <label class="block text-sm font-semibold text-slate-500 mb-2">Delivery Address (on
+                                provider's route)</label>
                             <div
-                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-2 border-primary">
+                                class="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary transition-all">
+                                <span class="material-icons text-red-500 text-lg">location_on</span>
+                                <input id="deliverySearch"
+                                    class="flex-1 bg-transparent border-none p-0 focus:ring-0 text-sm"
+                                    placeholder="Search delivery destination..." type="text"
+                                    oninput="handleSearchInput(this, 'delivery')" />
                             </div>
-                            <label class="block text-sm font-semibold text-slate-500 mb-2">Delivery Address</label>
-                            <input
-                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
-                                placeholder="Enter destination" type="text" />
+                            <div id="deliveryResults"
+                                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -171,9 +205,9 @@
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-500 mb-2">Preferred Pickup Time</label>
                             <div class="flex gap-4">
-                                <input
+                                <input id="pickupDate"
                                     class="flex-1 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
-                                    type="date" />
+                                    type="text" placeholder="Select Date" readonly />
                                 <input
                                     class="flex-1 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-primary focus:border-primary"
                                     type="time" />
@@ -195,11 +229,22 @@
 
                     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
                         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+                    <!-- Flatpickr for Restricted Date Selection -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+                    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
                     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
                         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+                    <script src="js/payment-system.js"></script>
 
-                    <div class="h-48 bg-slate-100 dark:bg-slate-900 relative rounded-xl overflow-hidden" id="map"
-                        style="z-index: 1;"></div>
+                    <div class="h-48 bg-slate-100 dark:bg-slate-900 relative rounded-xl overflow-hidden group"
+                        id="map-container">
+                        <div id="map" class="w-full h-full" style="z-index: 1;"></div>
+                        <button onclick="openMapModal()"
+                            class="absolute top-2 right-2 z-[401] bg-white dark:bg-slate-800 p-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">
+                            <span class="material-icons text-xs">fullscreen</span> Expand
+                        </button>
+                    </div>
 
                     <script>
                         let map;
@@ -214,25 +259,17 @@
                 </div>
 
                 <!-- Action Section -->
-                <div id="searchAction"
+                <div id="bookingAction"
                     class="bg-white dark:bg-slate-800 rounded-2xl p-6 card-shadow border border-white dark:border-slate-700">
-                    <h3 class="font-bold text-lg mb-4">Find Available Space</h3>
-                    <p class="text-sm text-slate-500 mb-6">Search for trucks traveling on your route with available
-                        capacity.</p>
+                    <h3 class="font-bold text-lg mb-4">Confirm Booking</h3>
+                    <p class="text-sm text-slate-500 mb-6">You are booking space on a truck traveling this route. Select
+                        your points on the map to continue.</p>
 
-                    <button onclick="searchTrucks()"
+                    <button id="bookBtn" onclick="handleBooking()"
                         class="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-3">
-                        <span class="material-symbols-outlined">search</span>
-                        Find Trucks
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        Book Truck
                     </button>
-                </div>
-
-                <!-- Results Container (Hidden by default) -->
-                <div id="resultsContainer" class="hidden space-y-4">
-                    <h3 class="font-bold text-lg px-2">Available Options (3)</h3>
-
-                    <!-- Result Template - Injected via JS -->
-                    <div id="resultsList" class="space-y-4"></div>
                 </div>
             </div>
         </div>
@@ -262,97 +299,354 @@
 
     <script>
         const API_URL = 'http://localhost:3000/api';
+        let currentListing = null;
+        let userPickup = null;
+        let userDelivery = null;
+        let searchTimeout;
 
-        // Auth Check
-        // Auth Check
-        const token = localStorage.getItem('token');
-        // User requested to remove auth requirement for viewing/booking flow
-        // if (!token) {
-        //     window.location.href = 'login.html';
-        // }
+        // Custom marker styles
+        const getLabeledIcon = (label, colorClass = 'bg-primary') => L.divIcon({
+            className: 'custom-marker',
+            html: `<div class="flex items-center justify-center w-7 h-7 rounded-full border-2 border-white shadow-xl ${colorClass} text-white text-[12px] font-black">${label}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
 
-        async function searchTrucks() {
-            const pickup = document.querySelector('input[placeholder="Enter collection point"]').value;
-            const delivery = document.querySelector('input[placeholder="Enter destination"]').value;
-            const weight = document.querySelector('input[placeholder="0.00"]').value;
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const listingId = urlParams.get('listing_id');
+            const qty = urlParams.get('qty') || 1;
 
-            if (!pickup || !delivery || !weight) {
-                alert("Please fill in Pickup, Delivery, and Weight details.");
+            if (listingId) {
+                await fetchListingDetails(listingId);
+            }
+
+            // Sync weight/quantity if provided
+            if (qty) {
+                document.querySelector('input[type="number"]').value = qty;
+            }
+        });
+
+        async function fetchListingDetails(id) {
+            try {
+                const res = await fetch(`${API_URL}/listings`);
+                const all = await res.json();
+                currentListing = all.find(l => l.id == id);
+
+                if (currentListing) {
+                    const routeText = currentListing.location || '';
+                    document.getElementById('headerRoute').innerText = routeText ? `(${routeText})` : '';
+                    document.getElementById('listingTypeBreadcrumb').innerText = currentListing.type.replace(/_/g, ' ').toUpperCase();
+                    document.getElementById('pageTitle').innerText = `${currentListing.type.replace(/_/g, ' ')} Booking`.toUpperCase();
+
+                    // Initialize restricted date picker
+                    if (currentListing.date) {
+                        const availableDates = currentListing.date.split(',').map(d => d.trim());
+                        flatpickr("#pickupDate", {
+                            enable: availableDates,
+                            dateFormat: "Y-m-d",
+                            minDate: "today",
+                            onChange: function (selectedDates, dateStr) {
+                                // Optional: handle date change
+                            }
+                        });
+                    }
+
+                    updateMapVisualization();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function updateMapVisualization() {
+            if (!map) return;
+
+            // Clear existing
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) map.removeLayer(layer);
+            });
+
+            const points = [];
+            const markers = [];
+
+            // A: Provider Start
+            if (currentListing?.details?.route_full?.start) {
+                const p = currentListing.details.route_full.start;
+                points.push([p.lat, p.lon]);
+                markers.push(L.marker([p.lat, p.lon], { icon: getLabeledIcon('A', 'bg-slate-600') }).bindPopup('Provider Start'));
+            }
+
+            // X: User Pickup
+            if (userPickup) {
+                points.push([userPickup.lat, userPickup.lon]);
+                markers.push(L.marker([userPickup.lat, userPickup.lon], { icon: getLabeledIcon('X', 'bg-emerald-500') }).bindPopup('Your Pickup'));
+            }
+
+            // Y: User Delivery
+            if (userDelivery) {
+                points.push([userDelivery.lat, userDelivery.lon]);
+                markers.push(L.marker([userDelivery.lat, userDelivery.lon], { icon: getLabeledIcon('Y', 'bg-red-500') }).bindPopup('Your Delivery'));
+            }
+
+            // B: Provider End
+            if (currentListing?.details?.route_full?.end) {
+                const p = currentListing.details.route_full.end;
+                points.push([p.lat, p.lon]);
+                markers.push(L.marker([p.lat, p.lon], { icon: getLabeledIcon('B', 'bg-slate-600') }).bindPopup('Provider End'));
+            }
+
+            markers.forEach(m => m.addTo(map));
+
+            if (points.length > 1) {
+                const poly = L.polyline(points, { color: '#3B82F6', weight: 4, dashArray: '5, 10' }).addTo(map);
+                map.fitBounds(poly.getBounds(), { padding: [40, 40] });
+                document.getElementById('routeStatus').innerText = 'Route Active';
+                document.getElementById('routeStatus').className = 'text-xs bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded-full font-bold';
+            }
+
+            // Sync with expanded map if open
+            if (expandedMap && !document.getElementById('mapExpansionModal').classList.contains('hidden')) {
+                syncExpandedMap();
+            }
+        }
+
+        let expandedMap;
+        function openMapModal() {
+            const modal = document.getElementById('mapExpansionModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setTimeout(() => {
+                if (!expandedMap) {
+                    expandedMap = L.map('expandedMapContainer', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(expandedMap);
+                }
+                syncExpandedMap();
+                setTimeout(() => expandedMap.invalidateSize(), 200);
+            }, 300);
+        }
+
+        function closeMapModal() {
+            document.getElementById('mapExpansionModal').classList.add('hidden');
+            document.getElementById('mapExpansionModal').classList.remove('flex');
+        }
+
+        function syncExpandedMap() {
+            if (!expandedMap) return;
+
+            // Clear existing
+            expandedMap.eachLayer(layer => {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) expandedMap.removeLayer(layer);
+            });
+
+            const points = [];
+
+            // Re-draw markers on expanded map
+            if (currentListing?.details?.route_full?.start) {
+                const p = currentListing.details.route_full.start;
+                points.push([p.lat, p.lon]);
+                L.marker([p.lat, p.lon], { icon: getLabeledIcon('A', 'bg-slate-600') }).addTo(expandedMap).bindPopup('Provider Start');
+            }
+            if (userPickup) {
+                points.push([userPickup.lat, userPickup.lon]);
+                L.marker([userPickup.lat, userPickup.lon], { icon: getLabeledIcon('X', 'bg-emerald-500') }).addTo(expandedMap).bindPopup('Your Pickup');
+            }
+            if (userDelivery) {
+                points.push([userDelivery.lat, userDelivery.lon]);
+                L.marker([userDelivery.lat, userDelivery.lon], { icon: getLabeledIcon('Y', 'bg-red-500') }).addTo(expandedMap).bindPopup('Your Delivery');
+            }
+            if (currentListing?.details?.route_full?.end) {
+                const p = currentListing.details.route_full.end;
+                points.push([p.lat, p.lon]);
+                L.marker([p.lat, p.lon], { icon: getLabeledIcon('B', 'bg-slate-600') }).addTo(expandedMap).bindPopup('Provider End');
+            }
+
+            if (points.length > 1) {
+                const poly = L.polyline(points, { color: '#3B82F6', weight: 4, dashArray: '5, 10' }).addTo(expandedMap);
+                expandedMap.fitBounds(poly.getBounds(), { padding: [50, 50] });
+            }
+        }
+
+        function handleSearchInput(input, type) {
+            clearTimeout(searchTimeout);
+            const query = input.value;
+            const container = document.getElementById(`${type}Results`);
+
+            if (query.length < 3) {
+                container.classList.add('hidden');
                 return;
             }
 
-            // Mock Search Delay
-            const btn = document.querySelector('#searchAction button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Searching...';
-            btn.disabled = true;
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                    const data = await res.json();
+                    showSearchResults(data, type, container);
+                } catch (err) { console.error(err); }
+            }, 500);
+        }
 
-            await new Promise(r => setTimeout(r, 1500));
+        function showSearchResults(data, type, container) {
+            container.innerHTML = '';
+            if (data.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
 
-            // Show Results
-            document.getElementById('searchAction').classList.add('hidden');
-            document.getElementById('resultsContainer').classList.remove('hidden');
-
-            // Generate Mock Data based on input
-            const basePrice = (parseFloat(weight) * 0.5).toFixed(2);
-
-            const results = [
-                { id: 1, name: "Eco Share Truck", type: "Standard", eta: "2 Days", price: basePrice, saving: "45%", icon: "local_shipping", color: "blue" },
-                { id: 2, name: "Express Logistics", type: "Fast", eta: "1 Day", price: (basePrice * 1.5).toFixed(2), saving: "20%", icon: "rocket_launch", color: "purple" },
-                { id: 3, name: "Budget Haul", type: "Saver", eta: "3-4 Days", price: (basePrice * 0.8).toFixed(2), saving: "60%", icon: "savings", color: "emerald" }
-            ];
-
-            const list = document.getElementById('resultsList');
-            list.innerHTML = '';
-
-            results.forEach(truck => {
-                const html = `
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all cursor-pointer group"
-                    onclick="selectOption('${truck.name}', ${truck.price}, '${truck.eta}')">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-${truck.color}-50 dark:bg-${truck.color}-900/20 flex items-center justify-center text-${truck.color}-600">
-                                <span class="material-symbols-outlined">${truck.icon}</span>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-slate-900 dark:text-white">${truck.name}</h4>
-                                <p class="text-xs text-slate-500">${truck.type} • ${truck.eta}</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full">Save ${truck.saving}</span>
-                    </div>
-                    <div class="flex justify-between items-end border-t border-slate-50 dark:border-slate-700 pt-3 mt-3">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Est. Total</p>
-                            <p class="text-xl font-bold text-slate-900 dark:text-white">$${truck.price}</p>
-                        </div>
-                        <button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">Select</button>
-                    </div>
-                </div>`;
-                list.insertAdjacentHTML('beforeend', html);
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 text-xs';
+                div.innerHTML = `<p class="font-medium text-slate-900 dark:text-white truncate">${item.display_name}</p>`;
+                div.onclick = () => {
+                    const point = { lat: parseFloat(item.lat), lon: parseFloat(item.lon), name: item.display_name.split(',')[0] };
+                    if (type === 'pickup') {
+                        userPickup = point;
+                        document.getElementById('pickupSearch').value = point.name;
+                    } else {
+                        userDelivery = point;
+                        document.getElementById('deliverySearch').value = point.name;
+                    }
+                    container.classList.add('hidden');
+                    updateMapVisualization();
+                };
+                container.appendChild(div);
             });
         }
 
-        function selectOption(name, price, eta) {
-            const pickup = document.querySelector('input[placeholder="Enter collection point"]').value;
-            const delivery = document.querySelector('input[placeholder="Enter destination"]').value;
+        async function handleBooking() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Please login to book.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!userPickup || !userDelivery) {
+                alert("Please select your pickup and delivery locations on the map search.");
+                return;
+            }
+
             const weight = document.querySelector('input[placeholder="0.00"]').value;
+            const btn = document.getElementById('bookBtn');
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+            btn.disabled = true;
 
-            const bookingDetails = {
-                type: 'cargo_split',
-                pickup: pickup,
-                delivery: delivery,
-                weight: weight,
-                service: name,
-                price: price,
-                eta: eta,
-                date: new Date().toISOString()
-            };
+            try {
+                // 1. Create the booking first (status will be confirmed, but payment_status unpaid)
+                const res = await fetch(`${API_URL}/bookings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        listing_id: currentListing.id,
+                        quantity: weight,
+                        details: {
+                            user_pickup: userPickup,
+                            user_delivery: userDelivery,
+                            cargo_type: document.querySelector('select').value,
+                            dimensions: {
+                                l: document.querySelector('input[placeholder="Length"]').value,
+                                w: document.querySelector('input[placeholder="Width"]').value,
+                                h: document.querySelector('input[placeholder="Height"]').value
+                            }
+                        }
+                    })
+                });
 
-            localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
-            window.location.href = 'booking.html';
+                const bookingData = await res.json();
+                if (!res.ok) {
+                    throw new Error(bookingData.message || "Booking failed.");
+                }
+
+                const booking = bookingData.booking;
+                const amount = booking.total_price;
+
+                // 2. Initiate Payment
+                const paymentResult = await PaymentSystem.initiate({
+                    booking_id: booking.id,
+                    amount: amount,
+                    method: 'UPI_QR'
+                });
+
+                // 3. Show Payment Modal
+                PaymentSystem.showModal({
+                    paymentId: paymentResult.paymentId,
+                    confirmationId: paymentResult.confirmationId,
+                    qrCodeData: paymentResult.qrCodeData,
+                    amount: amount
+                }, async (confirmedData) => {
+                    // Payment confirmed successfully
+                    alert('Booking and Payment Successful! Your confirmation ID is ' + confirmedData.confirmationId);
+                    window.location.href = 'consumer.html';
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message || "An error occurred.");
+            } finally {
+                btn.innerHTML = '<span class="material-symbols-outlined">shopping_cart</span> Book Truck';
+                btn.disabled = false;
+            }
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         }
     </script>
+    <style>
+        .custom-marker {
+            background: none !important;
+            border: none !important;
+        }
+    </style>
+
+    <!-- Expandable Map Modal -->
+    <div id="mapExpansionModal"
+        class="fixed inset-0 z-[2000] hidden bg-slate-900/90 backdrop-blur-sm items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-w-5xl overflow-hidden shadow-2xl relative border border-white/10">
+            <div
+                class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                        <span class="material-icons">fullscreen</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Expanded
+                            Route View</h3>
+                        <p class="text-[10px] text-slate-500 font-medium tracking-tight">Interactive A-X-Y-B Path
+                            Visualization</p>
+                    </div>
+                </div>
+                <button onclick="closeMapModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 text-slate-500 transition-all">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div id="expandedMapContainer" class="h-[65vh] w-full z-0"></div>
+            <div
+                class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div class="flex gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-slate-600"></div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Provider</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Pickup</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Delivery</span>
+                    </div>
+                </div>
+                <button onclick="closeMapModal()"
+                    class="px-8 py-3 bg-primary text-white rounded-2xl text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                    Close Preview
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

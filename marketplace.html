@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIO | Marketplace & Auctions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/payment-system.js"></script>
+    <script src="js/theme.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .card-shadow {
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+        }
+
+        .auction-timer {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white min-h-screen">
+    <!-- Nav -->
+    <nav
+        class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div class="w-12 h-12 rounded-xl overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-[#111418] dark:text-white">UNIO</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-black dark:text-white">
+                <a class="text-sm font-medium hover:text-primary transition-colors text-slate-500"
+                    href="consumer.html">Dashboard</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors text-primary"
+                    href="marketplace.html">Marketplace</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors text-slate-500"
+                    href="community.html">Community</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="openSellModal()"
+                    class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary/20">
+                    List Item
+                </button>
+                <button
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-black dark:text-white relative"
+                    id="notifButton">
+                    <span class="material-symbols-outlined text-xl">notifications</span>
+                    <span id="notifBadge"
+                        class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-slate-900"></span>
+                </button>
+                <button
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-black dark:text-white"
+                    onclick="window.toggleTheme()">
+                    <span class="material-symbols-outlined text-xl dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined text-xl hidden dark:inline">light_mode</span>
+                </button>
+                <button onclick="toggleActivity()"
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-black dark:text-white">
+                    <span class="material-symbols-outlined text-xl">inventory_2</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Filters & Search -->
+        <div class="space-y-8 mb-12">
+            <div class="flex flex-col md:flex-row gap-6 items-end justify-between">
+                <div class="space-y-4">
+                    <h1 class="text-4xl font-black tracking-tight">Discover Splendid Finds</h1>
+                    <div class="flex gap-2">
+                        <button onclick="filterType('all')" id="filterViewAll"
+                            class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 transition-all border border-primary">All
+                            Items</button>
+                        <button onclick="filterType('auction')" id="filterViewAuction"
+                            class="px-5 py-2.5 rounded-xl bg-slate-400/50 dark:bg-slate-800/50 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-400 dark:border-slate-700">Live
+                            Auctions</button>
+                        <button onclick="filterType('sale')" id="filterViewSale"
+                            class="px-5 py-2.5 rounded-xl bg-slate-400/50 dark:bg-slate-800/50 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-400 dark:border-slate-700">Fixed
+                            Price</button>
+                        <button onclick="filterType('my')" id="filterViewMy"
+                            class="px-5 py-2.5 rounded-xl bg-slate-400/50 dark:bg-slate-800/50 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-400 dark:border-slate-700">My
+                            Items</button>
+                    </div>
+                </div>
+                <div class="relative w-full md:w-96">
+                    <span
+                        class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+                    <input type="text" id="marketplaceSearch" placeholder="Search gems..."
+                        oninput="handleSearch(this.value)"
+                        class="w-full pl-14 pr-6 py-4 bg-white dark:bg-slate-800/30 border border-slate-300 dark:border-slate-800 focus:border-primary rounded-[20px] text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 shadow-sm dark:shadow-none">
+                </div>
+            </div>
+
+            <!-- Categories Row -->
+            <div class="flex items-center gap-3 overflow-x-auto pb-4 sidebar-scroll">
+                <button onclick="filterCategory('All')"
+                    class="category-pill active whitespace-nowrap px-6 py-2.5 rounded-full bg-primary text-white text-xs font-bold transition-all border border-primary">All
+                    Categories</button>
+                <button onclick="filterCategory('Electronics')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Electronics</button>
+                <button onclick="filterCategory('Vehicles')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Vehicles</button>
+                <button onclick="filterCategory('Real Estate')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Real
+                    Estate</button>
+                <button onclick="filterCategory('Home & Garden')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Home
+                    & Garden</button>
+                <button onclick="filterCategory('Fashion')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Fashion</button>
+                <button onclick="filterCategory('Sports')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Sports</button>
+                <button onclick="filterCategory('Books')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Books</button>
+                <button onclick="filterCategory('Other')"
+                    class="category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700">Other</button>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div id="marketplaceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Loading States -->
+            <div class="animate-pulse bg-slate-200/50 dark:bg-slate-800/20 h-80 rounded-3xl border border-slate-200 dark:border-slate-800"></div>
+            <div class="animate-pulse bg-slate-200/50 dark:bg-slate-800/20 h-80 rounded-3xl border border-slate-200 dark:border-slate-800 delay-75"></div>
+            <div class="animate-pulse bg-slate-200/50 dark:bg-slate-800/20 h-80 rounded-3xl border border-slate-200 dark:border-slate-800 delay-150"></div>
+            <div class="animate-pulse bg-slate-200/50 dark:bg-slate-800/20 h-80 rounded-3xl border border-slate-200 dark:border-slate-800 delay-300"></div>
+        </div>
+    </main>
+
+    <!-- Sell Modal -->
+    <div id="sellModal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeSellModal()"></div>
+        <div
+            class="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 animate-slide-up text-slate-900 dark:text-white">
+            <h2 class="text-2xl font-black mb-6">List New Item</h2>
+            <form id="sellForm" class="space-y-5">
+                <div class="flex gap-2 p-1 bg-slate-50 dark:bg-slate-950/50 rounded-2xl mb-4 border border-slate-200 dark:border-none">
+                    <button type="button" onclick="setListingType('sale')" id="typeBtnSale"
+                        class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-primary text-white">Fixed
+                        Price</button>
+                    <button type="button" onclick="setListingType('auction')" id="typeBtnAuction"
+                        class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white">Auction</button>
+                </div>
+                <input type="hidden" id="listingType" value="sale">
+
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Title</label>
+                    <input type="text" id="listingTitle" required
+                        class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 dark:text-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Category</label>
+                        <select id="listingCategory"
+                            class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all appearance-none">
+                            <option value="Electronics">Electronics</option>
+                            <option value="Vehicles">Vehicles</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Home & Garden">Home & Garden</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Books">Books</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Photo</label>
+                        <!-- Tab buttons -->
+                        <div class="flex gap-1 p-1 bg-slate-950/50 rounded-xl mb-3">
+                            <button type="button" onclick="setPhotoTab('url')" id="photoTabUrl"
+                                class="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-primary text-white">
+                                URL
+                            </button>
+                            <button type="button" onclick="setPhotoTab('file')" id="photoTabFile"
+                                class="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all text-slate-500 hover:text-white">
+                                Upload File
+                            </button>
+                        </div>
+                        <!-- URL input -->
+                        <div id="photoUrlInput">
+                            <input type="url" id="listingPhoto" placeholder="https://..."
+                                class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 dark:text-white"
+                                oninput="previewPhotoUrl(this.value)">
+                        </div>
+                        <!-- File input -->
+                        <div id="photoFileInput" class="hidden">
+                            <label
+                                class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-700 rounded-2xl cursor-pointer hover:border-primary transition-all bg-slate-950/30 hover:bg-primary/5">
+                                <span class="material-symbols-outlined text-slate-500 text-2xl mb-1">upload</span>
+                                <span class="text-[11px] text-slate-500 font-bold">Click to choose image</span>
+                                <input type="file" id="listingPhotoFile" accept="image/*" class="hidden"
+                                    onchange="handleFileSelect(this)">
+                            </label>
+                        </div>
+                        <!-- Preview -->
+                        <div id="photoPreview" class="hidden mt-3 relative">
+                            <img id="photoPreviewImg" src=""
+                                class="w-full h-28 object-cover rounded-2xl border border-slate-700" alt="Preview">
+                            <button type="button" onclick="clearPhoto()"
+                                class="absolute top-2 right-2 w-6 h-6 bg-slate-900/80 rounded-full flex items-center justify-center text-slate-400 hover:text-white">
+                                <span class="material-symbols-outlined text-xs">close</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Description</label>
+                    <textarea id="listingDesc"
+                        class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm h-24 focus:ring-2 focus:ring-primary outline-none transition-all resize-none text-slate-900 dark:text-white"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div id="priceField">
+                        <label
+                            class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Price
+                            (₹)</label>
+                        <input type="number" id="listingPrice"
+                            class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 dark:text-white">
+                    </div>
+                    <div id="bidField" class="hidden">
+                        <label
+                            class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Starting
+                            Bid (₹)</label>
+                        <input type="number" id="listingStartBid"
+                            class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 dark:text-white">
+                    </div>
+                    <div id="endField" class="hidden">
+                        <label
+                            class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Ends
+                            In (Days)</label>
+                        <input type="number" id="listingDuration"
+                            class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 dark:text-white"
+                            value="7">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn"
+                    class="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0 transition-all mt-6">
+                    Launch Listing
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Split Create Modal -->
+    <div id="splitCreateModal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeSplitCreateModal()"></div>
+        <div class="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
+            <h2 class="text-2xl font-black mb-2">Propose a Split</h2>
+            <p id="splitItemName" class="text-primary font-bold text-sm mb-6">Item Title</p>
+
+            <form id="splitCreateForm" class="space-y-6">
+                <input type="hidden" id="splitItemId">
+                <input type="hidden" id="splitItemPrice">
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-3 ml-1">How
+                        many people total?</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="splitSlots" min="2" max="10" value="2"
+                            class="flex-1 accent-primary h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                            oninput="updateSplitCalc()">
+                        <span id="slotCount" class="w-12 text-center font-black text-xl text-white">2</span>
+                    </div>
+                    <div
+                        class="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-400">Price per person</span>
+                        <span id="pricePerPerson" class="text-lg font-black text-primary">₹0</span>
+                    </div>
+                </div>
+
+                <div id="paymentToggleRow" class="hidden">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <div class="relative">
+                            <input type="checkbox" id="paymentEnabled" class="sr-only peer">
+                            <div
+                                class="w-12 h-6 bg-slate-800 rounded-full peer peer-checked:bg-emerald-500 transition-all">
+                            </div>
+                            <div
+                                class="absolute left-1 top-1 w-4 h-4 bg-slate-400 rounded-full peer-checked:translate-x-6 peer-checked:bg-white transition-all">
+                            </div>
+                        </div>
+                        <div>
+                            <span
+                                class="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">Require
+                                Payment via UNIO</span>
+                            <p class="text-[10px] text-slate-500">Automatically handle collections for this split</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Your
+                        Terms / Usage Plan</label>
+                    <textarea id="creatorTerms" required placeholder="e.g. I'll take it Mon-Wed, you have it Thu-Sun..."
+                        class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm h-32 focus:ring-2 focus:ring-primary outline-none transition-all resize-none text-slate-900 dark:text-white"></textarea>
+                </div>
+
+                <button type="submit" id="submitSplitBtn"
+                    class="w-full py-4 bg-primary text-white rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0 transition-all">
+                    Launch Split Proposal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Split View/Join Modal -->
+    <div id="splitViewModal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeSplitViewModal()"></div>
+        <div
+            class="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] text-slate-900 dark:text-white">
+            <h2 class="text-2xl font-black mb-1">Active Splits</h2>
+            <p id="viewSplitItemName" class="text-primary font-bold text-sm mb-6">Item Title</p>
+
+            <div id="splitsContainer" class="flex-1 overflow-y-auto space-y-4 pr-2 sidebar-scroll mb-6">
+                <!-- Splits list here -->
+            </div>
+
+            <button onclick="openSplitCreateModalFromView()"
+                class="w-full py-3 border-2 border-dashed border-slate-700 hover:border-primary text-slate-500 hover:text-primary rounded-2xl text-xs font-bold transition-all">
+                + Create New Split Proposal
+            </button>
+        </div>
+    </div>
+
+    <!-- Join Split Form Modal (nested feel) -->
+    <div id="splitJoinModal" class="fixed inset-0 z-[110] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm" onclick="closeSplitJoinModal()"></div>
+        <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
+            <h2 class="text-xl font-black mb-4">Join Split</h2>
+            <p class="text-xs text-slate-600 dark:text-slate-500 mb-6">Contribute your share and define your usage terms.</p>
+
+            <form id="splitJoinForm" class="space-y-6">
+                <input type="hidden" id="joinSplitId">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 ml-1">Your
+                        Usage Terms</label>
+                    <textarea id="joinTerms" required placeholder="Describe how you'll use this item..."
+                        class="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-sm h-32 focus:ring-2 focus:ring-primary outline-none transition-all resize-none text-slate-900 dark:text-white"></textarea>
+                </div>
+
+                <div id="paymentRequiredNotice"
+                    class="hidden p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
+                    <div class="flex gap-3">
+                        <span class="material-symbols-outlined text-amber-500">payments</span>
+                        <div>
+                            <p class="text-xs font-bold text-amber-500">Payment Required</p>
+                            <p class="text-[10px] text-slate-400">You must complete the payment to join this split.
+                                Funds are held securely until the split is filled.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="confirmJoinBtn"
+                    class="w-full py-4 bg-emerald-500 text-[#0f172a] rounded-2xl font-black text-sm shadow-xl shadow-emerald-500/20 transition-all">
+                    Confirm & Join Split
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chat Overlay -->
+
+    <div id="chatOverlay" class="fixed bottom-8 right-8 z-[200] hidden">
+        <div
+            class="w-96 h-[500px] bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center text-slate-900 dark:text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">person</span>
+                    </div>
+                    <div>
+                        <h4 id="chatPartnerName" class="font-bold text-sm text-slate-900 dark:text-white">Seller Name</h4>
+                        <p id="chatItemTitle"
+                            class="text-[10px] text-slate-500 font-bold uppercase truncate max-w-[120px]">Product Name
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeChat()" class="text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="messageArea" class="flex-1 overflow-y-auto p-6 space-y-4 sidebar-scroll"></div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <form id="chatForm" class="flex gap-2">
+                    <input type="text" id="chatInput" placeholder="Type a message..."
+                        class="flex-1 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400">
+                    <button type="submit"
+                        class="w-11 h-11 bg-primary text-white rounded-xl flex items-center justify-center"><span
+                            class="material-symbols-outlined">send</span></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant Floating Button & Chat -->
+    <div class="fixed bottom-24 right-8 z-[120] flex flex-col items-end gap-4">
+        <!-- Chat Window -->
+        <div id="aiAssistantChat"
+            class="hidden flex-col w-[380px] h-[500px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-white/20 dark:border-slate-700/50 overflow-hidden opacity-0">
+            <div class="p-6 bg-primary text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined">smart_toy</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">UNIO Assistant</h4>
+                        <p class="text-[10px] opacity-80">Online & Ready to Help</p>
+                    </div>
+                </div>
+                <button onclick="toggleAIChat()" class="hover:rotate-90 transition-transform">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="aiMessageArea" class="flex-1 overflow-y-auto p-6 space-y-4 sidebar-scroll text-slate-900 dark:text-white">
+                <!-- Messages will be injected here -->
+            </div>
+
+            <div class="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700">
+                <div id="aiOptionsArea" class="flex flex-col gap-2">
+                    <!-- Dynamic option buttons will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toggle Button -->
+        <button onclick="toggleAIChat()" id="aiToggleBtn"
+            class="w-16 h-16 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group relative">
+            <span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">smart_toy</span>
+            <div
+                class="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-900 rounded-full">
+            </div>
+        </button>
+    </div>
+
+    <!-- Activity Drawer -->
+    <div id="activityDrawer"
+        class="fixed right-0 top-0 bottom-0 w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 z-[110] translate-x-full transition-transform duration-500 flex flex-col shadow-2xl">
+        <div class="p-8 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white">My Activity</h3>
+            <button onclick="toggleActivity()" class="text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-8 space-y-8 sidebar-scroll">
+            <!-- Messages Inbox -->
+            <div>
+                <h4
+                    class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">chat_bubble</span> Messages
+                </h4>
+                <div id="myInboxContainer" class="space-y-3">
+                    <p class="text-xs text-slate-500 italic">Loading messages...</p>
+                </div>
+            </div>
+            <!-- Active Bids -->
+            <div>
+                <h4
+                    class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">gavel</span> Active Bids
+                </h4>
+                <div id="myBidsContainer" class="space-y-3"></div>
+            </div>
+            <!-- My Splits -->
+            <div>
+                <h4
+                    class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">handshake</span> My Splits
+                </h4>
+                <div id="mySplitsContainer" class="space-y-3">
+                    <p class="text-xs text-slate-500 italic">No split proposals yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        let items = [];
+        let currentType = 'all';
+        let currentCategory = 'All';
+        let searchQuery = '';
+        let currentChatId = null;
+        let chatInterval = null;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchItems();
+            fetchActivity();
+            setInterval(fetchItems, 30000); // Polling for auctions
+            setInterval(updateAuctionTimers, 1000); // Update auction timers every second
+            setInterval(fetchActivity, 5000); // Real-time activity & inbox updates
+        });
+
+        async function fetchItems() {
+            try {
+                const token = localStorage.getItem('token');
+                let userId = null;
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        userId = payload.id;
+                    } catch (e) { console.error('Token decode error', e); }
+                }
+
+                let url = `${API_URL}/marketplace?category=${currentCategory}`;
+
+                if (currentType === 'my') {
+                    if (!userId) {
+                        alert('Please login to see your items');
+                        return;
+                    }
+                    url += `&seller_id=${userId}`;
+                } else {
+                    url += `&type=${currentType}`;
+                    if (userId) {
+                        url += `&exclude_seller_id=${userId}`;
+                    }
+                }
+
+                const res = await fetch(url);
+                const allItems = await res.json();
+
+                // Client-side search filtering
+                items = allItems.filter(item =>
+                    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+
+                renderItems();
+            } catch (err) { console.error(err); }
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('marketplaceGrid');
+            if (items.length === 0) {
+                const emptyMsg = currentType === 'my'
+                    ? 'You haven\'t listed any items yet. Click "List Item" to get started!'
+                    : 'Try adjusting your filters or search query';
+                grid.innerHTML = `
+                    <div class="col-span-full py-20 text-center">
+                        <div class="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span class="material-symbols-outlined text-slate-500 text-4xl">inventory_2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-400">No items found</h3>
+                        <p class="text-slate-600 text-sm mt-2">${emptyMsg}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const isMyItemsView = currentType === 'my';
+
+            grid.innerHTML = items.map(item => {
+                const isAuction = item.type === 'auction';
+                const currentPrice = isAuction ? item.current_highest_bid : item.price;
+                const statusColor = isAuction ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500';
+                const imageUrl = (item.images && item.images.length) ? item.images[0] : 'https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=800&auto=format&fit=crop';
+
+                const buyButton = isAuction ? `
+                    <button onclick="placeBid('${item.id}', ${currentPrice})" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-[#0f172a] rounded-2xl font-black text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98]">
+                        Place Bid
+                    </button>
+                ` : `
+                    <button onclick="startChat('${item.id}', '${item.title}', '${item.seller_name}')" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-[#0f172a] rounded-2xl font-black text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]">
+                        Chat to Buy
+                    </button>
+                `;
+
+                const actionArea = isMyItemsView ? `
+                    <div class="flex items-center justify-between mb-4 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Type</p>
+                            <p class="text-[11px] font-bold text-slate-900 dark:text-white">${isAuction ? 'Auction' : 'Fixed Price'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">${isAuction ? 'High Bid' : 'Price'}</p>
+                            <p class="text-base font-black ${isAuction ? 'text-amber-500' : 'text-emerald-500'}">₹${currentPrice}</p>
+                        </div>
+                    </div>
+                    <button onclick="deactivateItem('${item.id}')" class="w-full py-3.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-2xl font-black text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">sell</span> Mark as Sold
+                    </button>
+                ` : `
+                    <div class="flex items-center justify-between mb-4 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">${isAuction ? 'Ending In' : 'Seller'}</p>
+                            <p class="text-[11px] font-bold text-slate-900 dark:text-white truncate max-w-[80px] ${isAuction ? 'auction-timer' : ''}" ${isAuction ? `data-end="${item.auction_end}"` : ''}>${isAuction ? calculateTimeLeft(item.auction_end) : item.seller_name}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">${isAuction ? 'High Bid' : 'Price'}</p>
+                            <p class="text-base font-black ${isAuction ? 'text-amber-500' : 'text-emerald-500'}">₹${currentPrice}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex gap-2 w-full">
+                            ${buyButton}
+                            <button onclick="handleDirectPay('${item.id}', ${currentPrice})" class="w-full py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black text-sm transition-all shadow-lg active:scale-[0.98] flex gap-2 items-center justify-center">
+                                Direct Pay ⚡
+                            </button>
+                        </div>
+                        ${!isAuction ? `
+                            <button onclick="handleSplitClick('${item.id}', '${item.title}', ${currentPrice})" class="w-full py-3 bg-slate-100 dark:bg-slate-800 hover:bg-teal-500/10 dark:hover:bg-teal-500/20 border border-slate-300 dark:border-slate-700 hover:border-teal-500/30 dark:hover:border-teal-500/40 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 rounded-2xl font-black text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm">handshake</span> Propose a Split
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+
+                return `
+                    <div class="group bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-primary/50 rounded-[32px] p-4 transition-all shadow-sm dark:shadow-none dark:card-shadow flex flex-col h-full hover:-translate-y-1">
+                        <div class="relative w-full h-48 mb-6 rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                             <img src="${imageUrl}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${item.title}">
+                             <div class="absolute top-4 left-4 ${statusColor} backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border border-white/10 shadow-xl">
+                                 ${isAuction ? 'Auction' : 'Sale'}
+                             </div>
+                             <div class="absolute top-4 right-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-slate-800 dark:text-white/70 px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/5">
+                                 ${item.category || 'Other'}
+                             </div>
+                        </div>
+                        <div class="px-2 flex-1 flex flex-col">
+                            <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">${item.title}</h3>
+                            <p class="text-slate-600 dark:text-slate-500 text-xs mb-6 line-clamp-2">${item.description}</p>
+                            <div class="mt-auto">${actionArea}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deactivateItem(id) {
+            if (!confirm('Mark this item as sold? It will be removed from the marketplace and no new messages will be possible.')) return;
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/marketplace/${id}/deactivate`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    fetchItems(); // Refresh
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Failed to deactivate item.');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // --- Filtering & Search ---
+        function filterType(type) {
+            currentType = type;
+            const buttons = {
+                'all': 'filterViewAll',
+                'auction': 'filterViewAuction',
+                'sale': 'filterViewSale',
+                'my': 'filterViewMy'
+            };
+
+            Object.keys(buttons).forEach(key => {
+                const btn = document.getElementById(buttons[key]);
+                if (btn) {
+                    btn.className = type === key ?
+                        'px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 transition-all border border-primary' :
+                        'px-5 py-2.5 rounded-xl bg-slate-400/50 dark:bg-slate-800/50 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-400 dark:border-slate-700';
+                }
+            });
+            fetchItems();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-pill').forEach(btn => {
+                const btnText = btn.innerText.replace('All Categories', 'All').trim();
+                if (cat === btnText || (cat === 'All' && btnText === 'All')) {
+                    btn.className = 'category-pill active whitespace-nowrap px-6 py-2.5 rounded-full bg-primary text-white text-xs font-bold transition-all border border-primary shadow-lg shadow-primary/20';
+                } else {
+                    btn.className = 'category-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all border border-slate-300 dark:border-slate-700';
+                }
+            });
+            fetchItems();
+        }
+
+        let searchTimeout;
+        function handleSearch(val) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = val;
+                fetchItems();
+            }, 300);
+        }
+
+        // --- Modals ---
+        function openSellModal() {
+            document.getElementById('sellModal').classList.remove('hidden');
+            document.getElementById('sellModal').classList.add('flex');
+        }
+        function closeSellModal() {
+            document.getElementById('sellModal').classList.add('hidden');
+            clearPhoto();
+            document.getElementById('sellForm').reset();
+            setPhotoTab('url');
+            setListingType('sale');
+        }
+
+        // --- Photo Upload Helpers ---
+        let uploadedPhotoUrl = null;
+
+        function setPhotoTab(tab) {
+            const isUrl = tab === 'url';
+            document.getElementById('photoUrlInput').classList.toggle('hidden', !isUrl);
+            document.getElementById('photoFileInput').classList.toggle('hidden', isUrl);
+            document.getElementById('photoTabUrl').className = isUrl
+                ? 'flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-primary text-white'
+                : 'flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all text-slate-500 hover:text-white';
+            document.getElementById('photoTabFile').className = !isUrl
+                ? 'flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-primary text-white'
+                : 'flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all text-slate-500 hover:text-white';
+            clearPhoto();
+        }
+
+        function previewPhotoUrl(url) {
+            if (!url) { clearPhoto(); return; }
+            document.getElementById('photoPreviewImg').src = url;
+            document.getElementById('photoPreview').classList.remove('hidden');
+            uploadedPhotoUrl = null;
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('photoPreviewImg').src = e.target.result;
+                document.getElementById('photoPreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearPhoto() {
+            uploadedPhotoUrl = null;
+            const urlInput = document.getElementById('listingPhoto');
+            if (urlInput) urlInput.value = '';
+            const fileInput = document.getElementById('listingPhotoFile');
+            if (fileInput) fileInput.value = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('photoPreviewImg').src = '';
+        }
+
+        function setListingType(type) {
+            document.getElementById('listingType').value = type;
+            const isAuction = type === 'auction';
+            document.getElementById('bidField').classList.toggle('hidden', !isAuction);
+            document.getElementById('endField').classList.toggle('hidden', !isAuction);
+            document.getElementById('priceField').classList.toggle('hidden', isAuction);
+
+            document.getElementById('typeBtnSale').className = isAuction ? 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-white' : 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-primary text-white';
+            document.getElementById('typeBtnAuction').className = isAuction ? 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-primary text-white' : 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-white';
+        }
+
+        document.getElementById('sellForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Listing...';
+
+            const type = document.getElementById('listingType').value;
+            const title = document.getElementById('listingTitle').value;
+            const category = document.getElementById('listingCategory').value;
+            const description = document.getElementById('listingDesc').value;
+            const price = document.getElementById('listingPrice').value;
+            const starting_bid = document.getElementById('listingStartBid').value;
+            const duration = document.getElementById('listingDuration').value;
+
+            let auction_end = null;
+            if (type === 'auction') {
+                const date = new Date();
+                date.setDate(date.getDate() + parseInt(duration));
+                auction_end = date.toISOString();
+            }
+
+            // Determine final photo URL
+            let photoUrl = document.getElementById('listingPhoto').value || null;
+            const fileInput = document.getElementById('listingPhotoFile');
+
+            // If file upload tab is active and a file was chosen, upload it first
+            if (!document.getElementById('photoFileInput').classList.contains('hidden') && fileInput.files[0]) {
+                try {
+                    const token = localStorage.getItem('token');
+                    const formData = new FormData();
+                    formData.append('image', fileInput.files[0]);
+                    const uploadRes = await fetch('/api/upload', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    if (uploadRes.ok) {
+                        const uploadData = await uploadRes.json();
+                        photoUrl = uploadData.url;
+                    } else {
+                        alert('Image upload failed. Please try a URL instead.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Launch Listing';
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Upload error', err);
+                    alert('Image upload failed.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Launch Listing';
+                    return;
+                }
+            }
+
+            const images = photoUrl ? [photoUrl] : [];
+
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/marketplace`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type, category, title, description, price, starting_bid, auction_end, images })
+                });
+                if (res.ok) {
+                    alert('Item listed successfully!');
+                    closeSellModal();
+                    fetchItems();
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Failed to list item.');
+                }
+            } catch (err) { console.error(err); }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Launch Listing';
+        });
+
+        // --- Auctions ---
+        async function placeBid(id, currentPrice) {
+            const amount = prompt(`Enter bid amount (must be higher than ₹${currentPrice}):`);
+            if (!amount || isNaN(amount) || parseFloat(amount) <= currentPrice) {
+                alert('Please enter a valid bid amount higher than the current bid.');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/marketplace/${id}/bid`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ amount: parseFloat(amount) })
+                });
+                if (res.ok) {
+                    alert('Bid placed successfully!');
+                    fetchItems();
+                    fetchActivity();
+                } else {
+                    const data = await res.json();
+                    alert(data.message);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function calculateTimeLeft(end) {
+            const remaining = new Date(end) - new Date();
+            if (remaining < 0) return 'ENDED';
+            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+            return `${days}d ${hours}h ${mins}m ${secs}s`;
+        }
+
+        async function handleDirectPay(itemId, price) {
+            if (price <= 0) return alert("This item is free!");
+
+            const confirmed = window.confirm(
+                "SECURITY WARNING:\\n\\n" +
+                "We are not responsible for the amount transferred through this dummy gateway.\\n" +
+                "We strongly recommend transacting in real life as it's more secure.\\n\\n" +
+                "Do you wish to proceed with the payment?"
+            );
+
+            if (!confirmed) return;
+
+            try {
+                const paymentResult = await PaymentSystem.initiate({
+                    item_id: itemId,
+                    amount: price,
+                    method: 'UPI_QR'
+                });
+
+                PaymentSystem.showModal({
+                    paymentId: paymentResult.paymentId,
+                    confirmationId: paymentResult.confirmationId,
+                    qrCodeData: paymentResult.qrCodeData,
+                    amount: price
+                }, async (confirmedData) => {
+                    alert("Payment Processed Successfully! Please message the seller your Confirmation ID: " + confirmedData.confirmationId);
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Payment initiation failed: " + err.message);
+            }
+        }
+
+        function updateAuctionTimers() {
+            document.querySelectorAll('.auction-timer').forEach(timerElement => {
+                const endTime = timerElement.dataset.end;
+                timerElement.innerText = calculateTimeLeft(endTime);
+            });
+        }
+
+        // --- Chat ---
+        async function startChat(itemId, itemTitle, sellerName) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/marketplace/chats`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ item_id: itemId })
+                });
+                const chat = await res.json();
+
+                if (res.ok) {
+                    currentChatId = chat.id;
+                    document.getElementById('chatOverlay').classList.remove('hidden');
+                    document.getElementById('chatPartnerName').innerText = sellerName;
+                    document.getElementById('chatItemTitle').innerText = itemTitle;
+                    document.getElementById('messageArea').innerHTML = '';
+                    loadMessages();
+                    if (chatInterval) clearInterval(chatInterval);
+                    chatInterval = setInterval(loadMessages, 3000);
+                } else {
+                    alert(chat.message);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadMessages() {
+            if (!currentChatId) return;
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/marketplace/chats/${currentChatId}/messages`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const messages = await res.json();
+                const area = document.getElementById('messageArea');
+                const userId = JSON.parse(atob(token.split('.')[1])).id;
+
+                area.innerHTML = messages.map(m => `
+                    <div class="flex flex-col ${m.sender_id === userId ? 'items-end' : 'items-start'}">
+                        <div class="p-3 rounded-2xl ${m.sender_id === userId ? 'bg-primary text-white rounded-tr-none' : 'bg-slate-800 text-slate-300 rounded-tl-none'} text-sm max-w-[80%] shadow-sm">
+                            ${m.content}
+                        </div>
+                    </div>
+                `).join('');
+                area.scrollTop = area.scrollHeight;
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const content = input.value.trim();
+            if (!content || !currentChatId) return;
+
+            try {
+                const token = localStorage.getItem('token');
+                await fetch(`${API_URL}/marketplace/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ chat_id: currentChatId, content })
+                });
+                input.value = '';
+                loadMessages();
+                fetchInbox();
+            } catch (err) { console.error(err); }
+        });
+
+        function closeChat() {
+            document.getElementById('chatOverlay').classList.add('hidden');
+            currentChatId = null;
+            if (chatInterval) clearInterval(chatInterval);
+        }
+
+        // --- Activity ---
+        function toggleActivity() {
+            const drawer = document.getElementById('activityDrawer');
+            drawer.classList.toggle('translate-x-full');
+        }
+
+        async function fetchActivity() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch(`${API_URL}/marketplace/my-activity`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const bidsCont = document.getElementById('myBidsContainer');
+                bidsCont.innerHTML = data.auctions.length ? data.auctions.map(a => `
+                    <div class="p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-primary/40 transition-all cursor-pointer shadow-sm dark:shadow-none">
+                        <h5 class="font-bold text-sm mb-1 line-clamp-1 text-slate-900 dark:text-slate-200">${a.title}</h5>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Current</span>
+                            <span class="text-xs font-black text-amber-500">₹${a.current_highest_bid}</span>
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-xs text-slate-500 italic">No active bids.</p>';
+
+                // Fetch Inbox as well
+                fetchInbox();
+            } catch (err) {
+                console.error('fetchActivity error:', err);
+                // Fallback: clear loading if possible
+                const bidsCont = document.getElementById('myBidsContainer');
+                if (bidsCont && !bidsCont.innerHTML) bidsCont.innerHTML = '<p class="text-xs text-rose-500 italic">Error loading activity.</p>';
+            }
+        }
+
+        async function fetchInbox() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch(`${API_URL}/marketplace/chats/inbox`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const chats = await res.json();
+                const container = document.getElementById('myInboxContainer');
+
+                if (chats.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-500 italic">No messages yet.</p>';
+                    return;
+                }
+
+                const userId = JSON.parse(atob(token.split('.')[1])).id;
+
+                container.innerHTML = chats.map(chat => {
+                    const isBuyer = chat.buyer_id === userId;
+                    const partnerName = isBuyer ? chat.seller_name : chat.buyer_name;
+                    const lastMsg = chat.last_message || 'No messages yet';
+
+                    return `
+                        <div onclick="openChatWindow('${chat.id}', '${chat.item_title.replace(/'/g, "\\'")}', '${partnerName.replace(/'/g, "\\'")}')" 
+                             class="p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-primary/40 transition-all cursor-pointer group shadow-sm dark:shadow-none">
+                            <div class="flex justify-between items-start mb-1">
+                                <h5 class="font-bold text-sm text-slate-900 dark:text-slate-200 group-hover:text-primary transition-colors">${partnerName}</h5>
+                                <span class="text-[9px] text-slate-500 dark:text-slate-600 font-black uppercase">${new Date(chat.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-500 font-medium mb-1 line-clamp-1 italic">${chat.item_title}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">${lastMsg}</p>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('fetchInbox error:', err);
+                const container = document.getElementById('myInboxContainer');
+                if (container) container.innerHTML = '<p class="text-xs text-rose-500 italic">Error loading messages.</p>';
+            }
+        }
+
+        function openChatWindow(chatId, itemTitle, partnerName) {
+            currentChatId = chatId;
+            document.getElementById('chatOverlay').classList.remove('hidden');
+            document.getElementById('chatOverlay').classList.add('flex');
+            document.getElementById('chatPartnerName').innerText = partnerName;
+            document.getElementById('chatItemTitle').innerText = itemTitle;
+            document.getElementById('messageArea').innerHTML = '';
+            loadMessages();
+            if (chatInterval) clearInterval(chatInterval);
+            chatInterval = setInterval(loadMessages, 3000);
+
+            // Close activity drawer if open
+            const drawer = document.getElementById('activityDrawer');
+            if (!drawer.classList.contains('translate-x-full')) {
+                drawer.classList.add('translate-x-full');
+            }
+        }
+
+        // --- Splits Logic ---
+        async function handleSplitClick(itemId, itemTitle, price) {
+            try {
+                const res = await fetch(`${API_URL}/splits/item/${itemId}`);
+                const splits = await res.json();
+
+                if (splits.length > 0) {
+                    openSplitViewModal(itemId, itemTitle, splits);
+                } else {
+                    openSplitCreateModal(itemId, itemTitle, price);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function openSplitViewModal(itemId, itemTitle, splits) {
+            document.getElementById('viewSplitItemName').innerText = itemTitle;
+            document.getElementById('splitViewModal').dataset.itemId = itemId;
+            document.getElementById('splitViewModal').dataset.itemTitle = itemTitle;
+
+            const container = document.getElementById('splitsContainer');
+            container.innerHTML = splits.map(s => {
+                const isFull = s.status === 'full';
+                const progress = (s.filled_slots / s.total_slots) * 100;
+
+                return `
+                    <div class="p-5 bg-slate-950/40 border border-slate-800 rounded-3xl relative overflow-hidden group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-bold text-sm text-white">${s.creator_name}'s Split</h4>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">₹${s.price_per_person} per person</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-black ${isFull ? 'text-emerald-500' : 'text-primary'}">${s.filled_slots}/${s.total_slots} filled</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-[10px] font-black text-slate-600 uppercase mb-2">Creator's Usage Plan</p>
+                            <div class="p-3 bg-slate-900 rounded-xl text-xs text-slate-400 border border-slate-800 italic">
+                                "${s.creator_terms}"
+                            </div>
+                        </div>
+
+                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden mb-4">
+                            <div class="h-full bg-primary transition-all duration-500" style="width: ${progress}%"></div>
+                        </div>
+
+                        <button onclick="openJoinModal(${s.id})" ${isFull ? 'disabled' : ''}
+                            class="w-full py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all 
+                            ${isFull ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary text-primary hover:text-white border border-primary/30'}">
+                            ${isFull ? 'Split Full' : 'Join this Split'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('splitViewModal').classList.remove('hidden');
+            document.getElementById('splitViewModal').classList.add('flex');
+        }
+
+        function openSplitCreateModalFromView() {
+            const modal = document.getElementById('splitViewModal');
+            const id = modal.dataset.itemId;
+            const title = modal.dataset.itemTitle;
+
+            // Need price - find it from the items list
+            const item = items.find(i => i.id == id);
+            const price = item ? (item.type === 'auction' ? item.current_highest_bid : item.price) : 0;
+
+            closeSplitViewModal();
+            openSplitCreateModal(id, title, price);
+        }
+
+        function closeSplitViewModal() {
+            document.getElementById('splitViewModal').classList.add('hidden');
+        }
+
+        function openSplitCreateModal(itemId, itemTitle, price) {
+            document.getElementById('splitItemId').value = itemId;
+            document.getElementById('splitItemPrice').value = price;
+            document.getElementById('splitItemName').innerText = itemTitle;
+
+            // Fetch item type to show/hide payment toggle
+            const item = items.find(i => i.id == itemId);
+            const toggleRow = document.getElementById('paymentToggleRow');
+            if (item && item.type === 'custom') {
+                toggleRow.classList.remove('hidden');
+            } else {
+                toggleRow.classList.add('hidden');
+            }
+
+            updateSplitCalc();
+            document.getElementById('splitCreateModal').classList.remove('hidden');
+            document.getElementById('splitCreateModal').classList.add('flex');
+        }
+
+        function closeSplitCreateModal() {
+            document.getElementById('splitCreateModal').classList.add('hidden');
+            document.getElementById('splitCreateForm').reset();
+        }
+
+        function updateSplitCalc() {
+            const slots = document.getElementById('splitSlots').value;
+            const price = document.getElementById('splitItemPrice').value;
+            document.getElementById('slotCount').innerText = slots;
+            document.getElementById('pricePerPerson').innerText = `₹${Math.round(price / slots)}`;
+        }
+
+        document.getElementById('splitCreateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const itemId = document.getElementById('splitItemId').value;
+            const item = items.find(i => i.id == itemId);
+            const isCustom = item && item.type === 'custom';
+
+            const data = {
+                item_id: itemId,
+                total_slots: parseInt(document.getElementById('splitSlots').value),
+                creator_terms: document.getElementById('creatorTerms').value,
+                payment_enabled: isCustom ? document.getElementById('paymentEnabled').checked : true
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/splits/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('Split proposal launched!');
+                    closeSplitCreateModal();
+                    fetchMySplits();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Failed to create split');
+                }
+            } catch (err) { console.error(err); }
+        });
+
+        async function openJoinModal(splitId) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/splits/${splitId}`);
+                const split = await res.json();
+
+                document.getElementById('joinSplitId').value = splitId;
+                document.getElementById('joinSplitId').dataset.paymentRequired = split.payment_required;
+                document.getElementById('joinSplitId').dataset.pricePerPerson = split.price_per_person;
+
+                const notice = document.getElementById('paymentRequiredNotice');
+                if (split.payment_required) {
+                    notice.classList.remove('hidden');
+                } else {
+                    notice.classList.add('hidden');
+                }
+
+                document.getElementById('splitJoinModal').classList.remove('hidden');
+                document.getElementById('splitJoinModal').classList.add('flex');
+            } catch (err) { console.error(err); }
+        }
+
+        function closeSplitJoinModal() {
+            document.getElementById('splitJoinModal').classList.add('hidden');
+        }
+
+        document.getElementById('splitJoinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const splitId = document.getElementById('joinSplitId').value;
+            const terms = document.getElementById('joinTerms').value;
+            const paymentRequired = document.getElementById('joinSplitId').dataset.paymentRequired === 'true';
+            const price = document.getElementById('joinSplitId').dataset.pricePerPerson;
+
+            const token = localStorage.getItem('token');
+            const btn = document.getElementById('confirmJoinBtn');
+            btn.disabled = true;
+            btn.innerText = 'Processing...';
+
+            try {
+                let paymentId = null;
+
+                if (paymentRequired) {
+                    // Initiate dummy payment
+                    const paymentResult = await PaymentSystem.initiate({
+                        split_id: splitId,
+                        amount: price,
+                        method: 'UPI'
+                    });
+
+                    // Show payment modal
+                    PaymentSystem.showModal({
+                        paymentId: paymentResult.payment.id,
+                        confirmationId: paymentResult.payment.confirmation_id,
+                        qrCodeData: paymentResult.qr_code,
+                        amount: price
+                    }, async (confirmedData) => {
+                        // Payment confirmed, now proceed with joining
+                        await completeJoin(splitId, terms, confirmedData.paymentId);
+                    });
+
+                    btn.disabled = false;
+                    btn.innerText = 'Confirm & Join Split';
+                    return; // Stop here, modal will handle the rest
+                } else {
+                    await completeJoin(splitId, terms, null);
+                }
+            } catch (err) {
+                console.error(err);
+                alert(err.message || 'Error joining split');
+                btn.disabled = false;
+                btn.innerText = 'Confirm & Join Split';
+            }
+        });
+
+        async function completeJoin(splitId, terms, paymentId) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/splits/join`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ split_id: splitId, terms, payment_id: paymentId })
+                });
+
+                if (res.ok) {
+                    alert('Successfully joined the split!');
+                    closeSplitJoinModal();
+                    closeSplitViewModal();
+                    fetchMySplits();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Failed to join split');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchMySplits() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch(`${API_URL}/splits/my-splits`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const splits = await res.json();
+                const container = document.getElementById('mySplitsContainer');
+
+                container.innerHTML = splits.length ? splits.map(s => `
+                    <div class="p-4 bg-slate-950/40 border border-slate-800 rounded-2xl">
+                        <div class="flex justify-between items-start mb-1">
+                            <h5 class="font-bold text-sm line-clamp-1 text-slate-200">${s.item_title}</h5>
+                            <span class="text-[9px] ${s.payment_required ? 'text-amber-500' : 'text-slate-600'} font-black uppercase">
+                                ${s.payment_required ? 'Payment Enabled' : 'Free Split'}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-slate-500 font-black uppercase tracking-wider">${s.filled_slots}/${s.total_slots} Slots</span>
+                            <span class="text-xs font-black text-primary">₹${Math.round(s.price_per_person)}</span>
+                        </div>
+                        <div class="mt-2 flex justify-between items-end">
+                            <div class="text-[10px] text-slate-500 italic truncate max-w-[150px]">
+                                 ${s.creator_terms}
+                            </div>
+                            ${s.payment_required ? `
+                                <div class="text-right">
+                                    <p class="text-[8px] text-slate-600 uppercase font-bold">Collected</p>
+                                    <p class="text-[10px] font-black text-emerald-500">₹${s.total_payment_amount || 0}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-xs text-slate-500 italic">No split proposals yet.</p>';
+            } catch (err) { console.error(err); }
+        }
+
+        // Add to existing activity fetch
+        const originalFetchActivity = fetchActivity;
+        fetchActivity = async () => {
+            await originalFetchActivity();
+            fetchMySplits();
+        };
+
+        // --- AI Assistant Logic ---
+        let isAIChatOpen = false;
+
+        function toggleAIChat() {
+            const chat = document.getElementById('aiAssistantChat');
+            const isOpen = chat.classList.toggle('hidden');
+            if (!isOpen) { 
+                chat.classList.add('active'); 
+                chat.style.opacity = '1';
+                isAIChatOpen = true; 
+                if (document.getElementById('aiMessageArea').children.length === 0) {
+                    interactChatbot('main_menu');
+                }
+            } else { 
+                chat.classList.remove('active'); 
+                chat.style.opacity = '0';
+                isAIChatOpen = false; 
+            }
+        }
+
+        function addAIMessage(role, text) {
+            const chatArea = document.getElementById('aiMessageArea');
+            const div = document.createElement('div');
+            div.className = `flex flex-col gap-1 max-w-[80%] animate-in fade-in slide-in-from-bottom-2 ${role === 'user' ? 'self-end ml-auto' : ''}`;
+
+            let msgHtml = '';
+            const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+            if (role === 'user') {
+                msgHtml = `<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-none text-sm shadow-sm">${formattedText}</div>
+                           <span class="text-[9px] text-slate-400 mr-1 self-end">You • Just now</span>`;
+            } else {
+                msgHtml = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none text-sm shadow-sm">${formattedText}</div>
+                           <span class="text-[9px] text-slate-400 ml-1">Assistant • Just now</span>`;
+            }
+
+            div.innerHTML = msgHtml;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function renderChatbotOptions(options) {
+            const optionsArea = document.getElementById('aiOptionsArea');
+            optionsArea.innerHTML = '';
+            
+            if (!options || options.length === 0) return;
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-primary hover:bg-blue-50 dark:hover:bg-slate-800 transition-all shadow-sm";
+                btn.innerText = opt.label;
+                btn.onclick = () => {
+                    addAIMessage('user', opt.label);
+                    optionsArea.innerHTML = '<div class="text-center text-xs text-slate-400 py-2 animate-pulse">Thinking...</div>';
+                    interactChatbot(opt.next, opt.context);
+                };
+                optionsArea.appendChild(btn);
+            });
+        }
+
+        async function interactChatbot(node_id, context = {}) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    addAIMessage('assistant', "Hello! I am the UNIO AI Assistant. Please log in or sign up above to track your orders, check your trust score, and manage your splits!");
+                    renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/chatbot/interact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ node_id, context })
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    addAIMessage('assistant', "Your session has expired. Please log in again to continue.");
+                    renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                    return;
+                }
+
+                if (!res.ok) throw new Error("Failed to fetch next step");
+
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    addAIMessage('assistant', data.message);
+                    renderChatbotOptions(data.options);
+                }, 400);
+
+                if (node_id === 'close_chat') {
+                    setTimeout(() => toggleAIChat(), 1500);
+                }
+            } catch (err) {
+                console.error("Chatbot Error:", err);
+                addAIMessage('assistant', "Sorry, I lost connection to the server. Let's restart.");
+                renderChatbotOptions([{ label: "Restart Chat", next: "main_menu" }]);
+            }
+        }
+    </script>
+
+</body>
+
+</html>

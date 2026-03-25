@@ -48,11 +48,18 @@ async function handleAuth() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Redirect based on role
+      // Redirect based on role and port
       if (data.user && data.user.role === 'admin') {
-        window.location.href = 'admin.html';
+          console.log("Admin detected, redirecting...");
+          // If accessing via port 3001 or any port if we want to force admin panel
+          if (window.location.port === '3001') {
+              window.location.href = 'admin-panel.html';
+          } else {
+              window.location.href = 'admin.html';
+          }
       } else {
-        window.location.href = 'index.html';
+          console.log("Consumer detected, redirecting to index...");
+          window.location.href = 'index.html';
       }
     } else {
       status.innerText = data.message || "Authentication failed";

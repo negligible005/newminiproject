@@ -1,33 +1,32 @@
-// Auto-Logout on Server Restart (Synchronous)
-// Using XMLHttpRequest with async: false to strictly block the browser
-// from rendering any DOM elements until we verify the session ID
+// js/auth.js
+// Runs immediately on every page load.
+// Compares stored server session ID with current server session ID.
+// If they differ (server restarted), clears all localStorage and redirects to index.html.
 
-function checkServerSessionSync() {
+(async function enforceSessionCheck() {
+    // Skip this check on login page to avoid a redirect loop during authentication
+    const path = window.location.pathname;
+    if (path.endsWith('login.html')) {
+        return;
+    }
+
     try {
-        const xhr = new XMLHttpRequest();
-        // The 'false' parameter makes it synchronous
-        xhr.open('GET', 'http://localhost:3000/api/sys/session', false);
-        xhr.send(null);
+        const res = await fetch('http://localhost:3000/api/sys/session');
+        if (!res.ok) return; // Server error — don't force logout
+        const data = await res.json();
 
-        if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
-            const currentSession = window.localStorage.getItem('server_session_id');
+        const stored = localStorage.getItem('server_session_id');
 
-            if (currentSession && currentSession !== data.sessionId) {
-                // Server restarted, clear auth
-                window.localStorage.removeItem('token');
-                window.localStorage.removeItem('user');
-                window.localStorage.setItem('server_session_id', data.sessionId);
-                // We don't need to trigger a full reload if the DOM hasn't loaded yet.
-                // Erasing local storage before DOMContentLoaded guarantees the site
-                // renders the "Guest" state automatically!
-            } else if (!currentSession) {
-                window.localStorage.setItem('server_session_id', data.sessionId);
-            }
+        if (!stored) {
+            // First time visiting — just store the session ID
+            localStorage.setItem('server_session_id', data.sessionId);
+        } else if (stored !== data.sessionId) {
+            // Server was restarted — force full logout
+            localStorage.clear();
+            window.location.replace('index.html');
         }
     } catch (e) {
-        console.error("Session check failed", e);
+        // Network error — don't force logout, it would lock users out when server is down
+        console.warn('Session check failed:', e.message);
     }
-}
-
-checkServerSessionSync();
+})();

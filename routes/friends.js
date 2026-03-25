@@ -9,19 +9,23 @@ router.post('/request', authenticateToken, async (req, res) => {
         const { friendId } = req.body;
         const userId = req.user.id;
 
-        if (userId === friendId) return res.status(400).json({ message: "Cannot friend yourself" });
+        if (userId === parseInt(friendId)) return res.status(400).json({ message: "Cannot friend yourself" });
 
-        const [id1, id2] = userId < friendId ? [userId, friendId] : [friendId, userId];
+        const [id1, id2] = userId < parseInt(friendId) ? [userId, parseInt(friendId)] : [parseInt(friendId), userId];
 
         await pool.query(
             "INSERT INTO friends (user_id1, user_id2, status) VALUES ($1, $2, 'pending') ON CONFLICT DO NOTHING",
             [id1, id2]
         );
 
-        // Create notification for the recipient
+        // Look up requester's name
+        const userRow = await pool.query("SELECT name FROM users WHERE id = $1", [userId]);
+        const requesterName = userRow.rows[0]?.name || `User ${userId}`;
+
+        // Create notification for the recipient — include requester ID at end for parsing
         await pool.query(
             "INSERT INTO notifications (user_id, type, content) VALUES ($1, 'friend_request', $2)",
-            [friendId, `You have a new friend request from user ${userId}`]
+            [parseInt(friendId), `${requesterName} wants to be your friend. [ID: ${userId}]`]
         );
 
         res.json({ message: "Friend request sent" });

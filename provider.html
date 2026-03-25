@@ -6,9 +6,16 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Unio | Provider Management Dashboard</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
     rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Flatpickr for Multi-Date Selection -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -41,6 +48,32 @@
 
     .chart-bar {
       transition: height 0.3s ease;
+    }
+
+    /* AI Assistant Styles */
+    #aiAssistantChat {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(20px) scale(0.95);
+    }
+
+    #aiAssistantChat.active {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      display: flex;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.3);
+      border-radius: 10px;
+    }
+
+    .custom-marker {
+      background: none !important;
+      border: none !important;
     }
   </style>
 </head>
@@ -142,149 +175,107 @@
         <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Provider Dashboard</h1>
         <p class="text-slate-500 dark:text-slate-400 mt-1">Manage your split resources and monitor earnings.</p>
       </div>
-      <a href="postspace.html">
-        <button
-          class="bg-primary hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95">
-          <span class="material-icons text-sm">add</span>
-          Start Splitting
-        </button>
-      </a>
 
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div
-          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-          <div class="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[100px]-full"></div>
-          <p class="text-slate-500 dark:text-slate-400 font-medium mb-1 relative z-10">Amount Earned</p>
-          <h4 class="text-4xl font-black text-slate-900 dark:text-white mb-2 relative z-10" id="providerAmountEarned">
-            ₹0.00</h4>
-          <div class="flex items-center text-primary text-sm font-bold relative z-10">
-            <span class="material-icons text-sm mr-1">trending_up</span>
-            Smart earnings
+    <!-- Top Stats & Requests Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Amount Earned Card with Mini Chart -->
+      <div
+        class="bg-card-light dark:bg-card-dark p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-primary/30 transition-all min-h-[240px] flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Amount Earned
+            </p>
+            <h4 class="text-3xl font-black text-slate-900 dark:text-white" id="providerAmountEarned">₹0.00</h4>
+          </div>
+          <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+            <span class="material-icons text-emerald-600 dark:text-emerald-400 text-sm">trending_up</span>
           </div>
         </div>
-        <div
-          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-          <div class="flex justify-between items-start mb-4 relative z-10">
-            <div>
-              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Live Asset Map</p>
-              <h2 class="text-xl font-bold text-slate-900 dark:text-white">Track Fleet</h2>
-            </div>
-            <span class="flex h-2 w-2 relative">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-          </div>
 
-          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-          <div id="providerMap" class="h-96 bg-slate-100 dark:bg-slate-800 rounded-lg w-full z-0 relative"></div>
-
-          <script>
-            document.addEventListener('DOMContentLoaded', () => {
-              setTimeout(() => {
-                const map = L.map('providerMap', {
-                  zoomControl: false,
-                  attributionControl: false
-                }).setView([12.9716, 77.5946], 10);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-                const truckIcon = L.divIcon({
-                  className: 'material-symbols-outlined text-primary text-xl',
-                  html: 'local_shipping',
-                  iconSize: [20, 20]
-                });
-
-                // Mock Assets
-                L.marker([12.9716, 77.5946], { icon: truckIcon }).addTo(map);
-                L.marker([13.0, 77.6], { icon: truckIcon }).addTo(map);
-              }, 1000);
-            });
-          </script>
-        </div>
-        <div
-          class="sm:col-span-2 bg-card-light dark:bg-card-dark rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h3 class="font-bold text-slate-900 dark:text-white">Active Postings</h3>
-            <div class="flex gap-2">
-              <span
-                class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full">Local</span>
-              <span class="text-slate-400 text-[10px] uppercase tracking-wider font-bold px-3 py-1">Global</span>
-            </div>
-          </div>
-          <div id="listingsContainer" class="p-6 space-y-4">
-            <div
-              class="flex items-center justify-between p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                  <span class="material-icons text-blue-600 dark:text-blue-400">local_shipping</span>
-                </div>
-                <div>
-                  <h4 class="font-semibold text-slate-900 dark:text-white">Truck #882 - Split Space</h4>
-                  <p class="text-xs text-slate-500">Bangalore → Cochin • Jan 20th</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-bold text-green-600 dark:text-green-400">500kg Space Left</p>
-                <p class="text-xs text-slate-400">3 Bookings</p>
-              </div>
-            </div>
-            <div
-              class="flex items-center justify-between p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
-                  <span class="material-icons text-cyan-600 dark:text-cyan-400">ac_unit</span>
-                </div>
-                <div>
-                  <h4 class="font-semibold text-slate-900 dark:text-white">Cold Hub - Pallet Split</h4>
-                  <p class="text-xs text-slate-500">Ernakulam North • -18°C Frozen</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-bold text-green-600 dark:text-green-400">12 Pallets Available</p>
-                <p class="text-xs text-slate-400">5 Bookings</p>
-              </div>
-            </div>
+        <!-- Chart.js Graph -->
+        <div class="h-32 w-full mt-2 relative">
+          <canvas id="earningsChart"></canvas>
+          <div
+            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 dark:bg-slate-900/20 backdrop-blur-[2px] rounded-lg pointer-events-none">
+            <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">Earnings Analysis</p>
           </div>
         </div>
       </div>
-      <div class="lg:col-span-5 space-y-6">
-        <div
-          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col min-h-[400px]">
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <h3 class="font-bold text-slate-900 dark:text-white leading-none">Earnings History</h3>
-              <p class="text-xs text-slate-500 mt-1">Confirmed bookings across all your assets</p>
-            </div>
-            <span class="material-icons text-slate-400 cursor-pointer">history</span>
-          </div>
 
-          <div class="overflow-y-auto pr-2 flex-grow" id="earningsHistoryContainer">
-            <div class="text-center py-12 text-slate-500 text-sm">Loading history...</div>
+      <!-- Cancellation Requests (Moved here) -->
+      <div
+        class="bg-card-light dark:bg-card-dark p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-amber-500/30 transition-all min-h-[240px]">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Cancellations
+            </p>
+            <h4 class="text-2xl font-bold text-slate-900 dark:text-white">Active Reqs</h4>
+          </div>
+          <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+            <span class="material-icons text-amber-600 dark:text-amber-400 text-sm">pending_actions</span>
           </div>
         </div>
+        <div id="cancellationRequestsContainer" class="space-y-2">
+          <div class="text-center py-4 text-slate-400 text-[10px] italic">No pending requests</div>
+        </div>
+      </div>
 
-        <!-- Cancellation Requests -->
-        <div
-          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <h3 class="font-bold text-slate-900 dark:text-white leading-none">Cancellation Requests</h3>
-              <p class="text-xs text-slate-500 mt-1">Pending consumer requests</p>
-            </div>
-            <span class="material-icons text-amber-500">pending_actions</span>
+      <!-- Earnings History (Moved here) -->
+      <div
+        class="bg-card-light dark:bg-card-dark p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-primary/30 transition-all flex flex-col min-h-[240px]">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Recent
+              Activity</p>
+            <h4 class="text-2xl font-bold text-slate-900 dark:text-white">History</h4>
           </div>
-          <div id="cancellationRequestsContainer" class="space-y-4">
-            <div class="text-center py-8 text-slate-500 text-sm">No pending requests.</div>
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <span class="material-icons text-blue-600 dark:text-blue-400 text-sm">history</span>
           </div>
         </div>
+        <div id="earningsHistoryContainer" class="max-h-[140px] overflow-y-auto sidebar-scroll pr-1 flex-1">
+          <div class="text-center py-4 text-slate-400 text-[10px] italic">Loading history...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <!-- Left Column: Active Postings -->
+      <div class="flex flex-col h-full">
         <div
-          class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
-          <h3 class="font-bold text-slate-900 dark:text-white mb-6">List New Space</h3>
+          class="bg-card-light dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-full">
+          <div
+            class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/30">
+            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span class="material-icons text-primary text-sm">list_alt</span>
+              Active Postings
+            </h3>
+            <div class="flex gap-2">
+              <span
+                class="bg-primary/10 text-primary text-[9px] uppercase tracking-widest font-black px-3 py-1 rounded-full">LIVE</span>
+            </div>
+          </div>
+          <div id="listingsContainer" class="p-6 space-y-4 flex-1 overflow-y-auto sidebar-scroll min-h-[500px]">
+            <div class="text-center py-20 text-slate-400 italic text-sm">Fetching your listings...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: List New Space -->
+      <div class="flex flex-col h-full">
+        <div
+          class="bg-card-light dark:bg-card-dark p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl relative overflow-hidden h-full">
+          <!-- Decorative Background Element -->
+          <div class="absolute -right-16 -top-16 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+
+          <h3 class="text-xl font-black text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span class="material-icons text-primary">add_box</span>
+            </div>
+            List New Space
+          </h3>
           <form class="space-y-4" id="publishForm">
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Resource Type</label>
@@ -295,27 +286,100 @@
                 <option value="warehouse">Warehouse Shared Space</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacity</label>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capacity</label>
+                  <!-- Segmented Toggle -->
+                  <div class="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5 border border-slate-200 dark:border-slate-800">
+                    <button type="button" onclick="setCapacityUnit('kg', 'publish')" id="unit-kg-publish" class="px-3 py-1 text-[9px] font-black rounded-md transition-all bg-white dark:bg-slate-800 text-primary shadow-sm">KG</button>
+                    <button type="button" onclick="setCapacityUnit('ton', 'publish')" id="unit-ton-publish" class="px-3 py-1 text-[9px] font-black rounded-md transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">TON</button>
+                  </div>
+                </div>
                 <input id="listingCapacity"
-                  class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
-                  placeholder="e.g. 500kg or 12 slots" type="text" />
+                  class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold focus:ring-primary focus:border-primary py-3 px-4 shadow-sm"
+                  placeholder="0" type="number" />
+                <input type="hidden" id="listingUnit" value="kg">
               </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price per
-                  Unit</label>
-                <input id="listingPrice"
-                  class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
-                  placeholder="0.00" type="number" />
+              <div class="space-y-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Price per Unit</label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                  <input id="listingPrice"
+                    class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold focus:ring-primary focus:border-primary py-3 pl-8 pr-4 shadow-sm"
+                    placeholder="0.00" type="number" />
+                </div>
               </div>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Location /
-                Route</label>
-              <input id="listingLocation"
-                class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
-                placeholder="e.g. Bangalore -> Cochin" type="text" />
+            <div class="space-y-4">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Route
+                Selection</label>
+
+              <!-- Search-based Inputs (Route) -->
+              <div id="routeInputsContainer" class="space-y-3">
+                <div class="relative autocomplete-container">
+                  <div class="flex items-center gap-2">
+                    <span class="material-icons text-emerald-500 text-sm">trip_origin</span>
+                    <input id="startSearch" type="text" placeholder="Search Start Location (e.g. Vadakara)"
+                      class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm py-3 focus:ring-primary"
+                      oninput="handleSearchInput(this, 'start')">
+                  </div>
+                  <div id="startResults"
+                    class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-48 overflow-y-auto">
+                  </div>
+                </div>
+
+                <!-- Dynamic Stops Container -->
+                <div id="stopsInputsContainer" class="space-y-3"></div>
+
+                <div class="relative autocomplete-container">
+                  <div class="flex items-center gap-2">
+                    <span class="material-icons text-red-500 text-sm">location_on</span>
+                    <input id="endSearch" type="text" placeholder="Search End Destination"
+                      class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm py-3 focus:ring-primary"
+                      oninput="handleSearchInput(this, 'end')">
+                  </div>
+                  <div id="endResults"
+                    class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-48 overflow-y-auto">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Single Location Input (Warehouse) -->
+              <div id="singleLocationContainer" class="hidden relative autocomplete-container">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons text-blue-500 text-sm">warehouse</span>
+                  <input id="warehouseSearch" type="text" placeholder="Search Warehouse Location"
+                    class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm py-3 focus:ring-primary"
+                    oninput="handleSearchInput(this, 'warehouse')">
+                </div>
+                <div id="warehouseResults"
+                  class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-48 overflow-y-auto">
+                </div>
+              </div>
+
+              <div id="routeControls" class="flex items-center justify-between gap-4 mt-2">
+                <button type="button" onclick="addStopInput()"
+                  class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                  <span class="material-icons text-sm">add_circle</span> Add Stop
+                </button>
+                <button type="button" onclick="clearRouteSearch()"
+                  class="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">Clear
+                  All</button>
+              </div>
+
+              <!-- Map Display (With Expand Feature) -->
+              <div class="relative group">
+                <div id="routePickerMap"
+                  class="h-64 bg-slate-100 dark:bg-slate-900 rounded-xl w-full z-0 relative border border-slate-200 dark:border-slate-800 overflow-hidden">
+                </div>
+                <button type="button" onclick="toggleMapModal('routePickerMap')"
+                  class="absolute top-3 right-3 z-[401] bg-white dark:bg-slate-800 p-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">
+                  <span class="material-icons text-sm">fullscreen</span> Expand View
+                </button>
+              </div>
+
+              <input id="listingLocation" type="hidden" />
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Base Cost (e.g.
@@ -326,10 +390,10 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Availability
-                Date</label>
+                Dates</label>
               <input id="listingDate"
                 class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3"
-                placeholder="e.g. Jan 20th" type="text" />
+                placeholder="Select dates..." type="text" readonly />
             </div>
             <button onclick="publishListing()"
               class="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:opacity-90 transition-opacity"
@@ -345,149 +409,825 @@
   <script>
     const API_URL = 'http://localhost:3000/api';
 
-    async function publishListing() {
-      const type = document.getElementById('listingType').value;
-      const capacity = document.getElementById('listingCapacity').value;
-      const price = document.getElementById('listingPrice').value;
-      const location = document.getElementById('listingLocation').value;
-      const date = document.getElementById('listingDate').value;
-      const baseCost = document.getElementById('listingBaseCost').value || 0;
+    // --- Route Picker Search & Map Logic ---
+    let routeMap;
+    let editRouteMap;
+    let routePoints = { start: null, end: null, stops: [] };
+    let editRoutePoints = { start: null, end: null, stops: [] };
+    let searchTimeout;
+    let editSearchTimeout;
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert("Please login first");
-        return;
+    function initRoutePickerMap() {
+      setTimeout(() => {
+        routeMap = L.map('routePickerMap', {
+          zoomControl: true,
+          attributionControl: false
+        }).setView([20.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(routeMap);
+        setTimeout(() => routeMap.invalidateSize(), 500);
+      }, 500);
+    }
+
+    function getLabeledIcon(label, colorClass = 'bg-primary') {
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `<div class="flex items-center justify-center w-7 h-7 rounded-full border-2 border-white shadow-xl ${colorClass} text-white text-[12px] font-black">${label}</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+      });
+    }
+
+    function updateRouteMap(targetMap = null) {
+      const activeMap = targetMap || routeMap;
+      if (!activeMap) return;
+
+      const results = getActivePoints();
+      const allPoints = results.points;
+      const labels = results.labels;
+
+      // Clear existing markers/polyline on THIS map
+      activeMap.eachLayer(layer => {
+        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+          activeMap.removeLayer(layer);
+        }
+      });
+
+      const leafletPoints = [];
+
+      allPoints.forEach((p, i) => {
+        if (p) {
+          const colorClass = i === 0 ? 'bg-emerald-500' : (i === allPoints.length - 1 ? 'bg-red-500' : 'bg-blue-500');
+          L.marker([p.lat, p.lon], { icon: getLabeledIcon(labels[i], colorClass) })
+            .addTo(activeMap).bindPopup(`<b>${labels[i]}:</b> ${p.name}`);
+          leafletPoints.push([p.lat, p.lon]);
+        }
+      });
+
+      if (leafletPoints.length > 1) {
+        L.polyline(leafletPoints, { color: '#2563eb', weight: 4, dashArray: '5, 10' }).addTo(activeMap);
+        activeMap.fitBounds(L.polyline(leafletPoints).getBounds(), { padding: [40, 40] });
+      } else if (leafletPoints.length === 1) {
+        activeMap.setView(leafletPoints[0], 13);
       }
 
-      try {
-        const res = await fetch(`${API_URL}/listings`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            type,
-            capacity,
-            price_per_unit: price,
-            base_cost: baseCost,
-            location,
-            date,
-            details: {}
-          })
-        });
+      // Sync name text
+      if (!targetMap) {
+        const names = allPoints.map(p => p.name);
+        document.getElementById('listingLocation').value = names.join(" -> ");
+      }
+    }
 
-        if (res.ok) {
-          alert('Listing submitted! It is now pending admin approval.');
-          fetchListings(); // Refresh list
-          document.getElementById('publishForm').reset();
+    function getActivePoints() {
+      const points = [];
+      const labels = [];
+      let charCode = 65; // 'A'
+
+      if (routePoints.start) {
+        points.push(routePoints.start);
+        labels.push(String.fromCharCode(charCode++));
+      }
+
+      routePoints.stops.forEach(p => {
+        if (p) {
+          points.push(p);
+          labels.push(String.fromCharCode(charCode++));
+        }
+      });
+
+      if (routePoints.end) {
+        points.push(routePoints.end);
+        labels.push(String.fromCharCode(charCode++));
+      }
+
+      return { points, labels };
+    }
+
+    // Modal Expansion Logic
+    let expandedMap;
+    function toggleMapModal(sourceId) {
+      const modal = document.getElementById('mapExpansionModal');
+      const isLogisticsEdit = sourceId === 'editRoutePickerMap';
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      setTimeout(() => {
+        if (!expandedMap) {
+          expandedMap = L.map('expandedMapContainer', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(expandedMap);
+        }
+
+        // Use the correct points data based on which map was clicked
+        if (isLogisticsEdit) {
+          syncEditMapUI(expandedMap);
         } else {
-          const err = await res.json();
-          alert('Failed to publish listing: ' + (err.message || 'Unknown error'));
+          updateRouteMap(expandedMap);
         }
-      } catch (err) {
-        console.error(err);
-        alert('Error publishing listing: ' + err.message);
-      }
+
+        setTimeout(() => expandedMap.invalidateSize(), 200);
+      }, 300);
     }
 
-    async function fetchListings() {
-      try {
+    function closeMapModal() {
+      document.getElementById('mapExpansionModal').classList.add('hidden');
+      document.getElementById('mapExpansionModal').classList.remove('flex');
+    }
+
+    // --- Handlers for Creation Flow ---
+    function handleSearchInput(input, type, index = null) {
+      clearTimeout(searchTimeout);
+      const query = input.value;
+      const resDiv = index !== null ? document.getElementById(`stopResults-${index}`) : document.getElementById(`${type}Results`);
+      if (query.length < 3) { resDiv.classList.add('hidden'); return; }
+      searchTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+          const data = await res.json();
+          showSearchResults(data, type, resDiv, index);
+        } catch (err) { console.error(err); }
+      }, 500);
+    }
+
+    function showSearchResults(data, type, container, index) {
+      container.innerHTML = '';
+      if (data.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 text-sm';
+        div.innerHTML = `<p class="font-medium text-slate-900 dark:text-white truncate">${item.display_name}</p>`;
+        div.onclick = () => {
+          const point = { lat: parseFloat(item.lat), lon: parseFloat(item.lon), name: item.display_name.split(',')[0] };
+          if (type === 'start') routePoints.start = point;
+          else if (type === 'end') routePoints.end = point;
+          else if (type === 'warehouse') {
+            routePoints.start = point;
+            routePoints.end = point;
+            routePoints.stops = [];
+          } else routePoints.stops[index] = point;
+          document.getElementById(index !== null ? `stopSearch-${index}` : `${type}Search`).value = point.name;
+          container.classList.add('hidden');
+          updateRouteMap();
+        };
+        container.appendChild(div);
+      });
+    }
+
+    function addStopInput() {
+      const idx = routePoints.stops.length; routePoints.stops.push(null);
+      document.getElementById('stopsInputsContainer').insertAdjacentHTML('beforeend', `
+        <div class="relative autocomplete-container" id="stopRow-${idx}">
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-blue-500 text-sm">pause_circle_filled</span>
+            <input id="stopSearch-${idx}" type="text" placeholder="Intermediate Stop" class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm py-3 focus:ring-primary" oninput="handleSearchInput(this, 'stop', ${idx})">
+            <button type="button" onclick="removeStopInput(${idx})" class="text-slate-400 hover:text-red-500"><span class="material-icons text-lg">remove_circle_outline</span></button>
+          </div>
+          <div id="stopResults-${idx}" class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-48 overflow-y-auto"></div>
+        </div>
+      `);
+    }
+
+    function removeStopInput(idx) {
+      document.getElementById(`stopRow-${idx}`).remove();
+      routePoints.stops[idx] = undefined;
+      updateRouteMap();
+    }
+
+    function clearRouteSearch() {
+      routePoints = { start: null, end: null, stops: [] };
+      document.getElementById('startSearch').value = '';
+      document.getElementById('endSearch').value = '';
+      document.getElementById('warehouseSearch').value = '';
+      document.getElementById('stopsInputsContainer').innerHTML = '';
+      updateRouteMap();
+    }
+
+    // --- Handlers for Edit Flow ---
+    function handleEditSearchInput(input, type, index = null) {
+      clearTimeout(editSearchTimeout);
+      const query = input.value;
+      const resDiv = index !== null ? document.getElementById(`editStopResults-${index}`) : document.getElementById(`edit${type.charAt(0).toUpperCase() + type.slice(1)}Results`);
+      if (query.length < 3) { resDiv.classList.add('hidden'); return; }
+      editSearchTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+          const data = await res.json();
+          showEditSearchResults(data, type, resDiv, index);
+        } catch (err) { console.error(err); }
+      }, 500);
+    }
+
+    function showEditSearchResults(data, type, container, index) {
+      container.innerHTML = '';
+      if (data.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 text-xs';
+        div.innerHTML = `<p class="font-medium text-slate-900 dark:text-white truncate">${item.display_name}</p>`;
+        div.onclick = () => selectEditLocation(item, type, index);
+        container.appendChild(div);
+      });
+    }
+
+    function selectEditLocation(item, type, index) {
+      const lat = parseFloat(item.lat);
+      const lon = parseFloat(item.lon);
+      const name = item.display_name.split(',')[0];
+      const point = { lat, lon, name, fullName: item.display_name };
+      if (type === 'start') editRoutePoints.start = point;
+      else if (type === 'end') editRoutePoints.end = point;
+      else if (type === 'warehouse') {
+        editRoutePoints.start = point;
+        editRoutePoints.end = point;
+        editRoutePoints.stops = [];
+      } else editRoutePoints.stops[index] = point;
+      document.getElementById(index !== null ? `editStopSearch-${index}` : `edit${type.charAt(0).toUpperCase() + type.slice(1)}Search`).value = name;
+      document.querySelectorAll('[id$="Results"]').forEach(d => d.classList.add('hidden'));
+      syncEditMapUI();
+    }
+
+    function addEditStopInput(existingIndex = null, existingName = '') {
+      const index = existingIndex !== null ? existingIndex : editRoutePoints.stops.length;
+      if (existingIndex === null) editRoutePoints.stops.push(null);
+      const container = document.getElementById('editStopsInputsContainer');
+      const html = `
+        <div class="relative autocomplete-container" id="editStopRow-${index}">
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-blue-500 text-[18px]">pause_circle_filled</span>
+            <input id="editStopSearch-${index}" type="text" placeholder="Stop" value="${existingName}"
+                   class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs py-2.5 focus:ring-primary"
+                   oninput="handleEditSearchInput(this, 'stop', ${index})">
+            <button type="button" onclick="removeEditStopInput(${index})" class="text-slate-400 hover:text-red-500">
+              <span class="material-icons text-base">remove_circle_outline</span>
+            </button>
+          </div>
+          <div id="editStopResults-${index}" class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto"></div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+    }
+
+    let createDatePicker;
+    let editDatePicker;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('listingType').addEventListener('change', function (e) {
+        const isWarehouse = e.target.value === 'warehouse';
+        document.getElementById('routeInputsContainer').classList.toggle('hidden', isWarehouse);
+        document.getElementById('routeControls').classList.toggle('hidden', isWarehouse);
+        document.getElementById('singleLocationContainer').classList.toggle('hidden', !isWarehouse);
+        clearRouteSearch();
+      });
+
+      // Initialize Date Pickers
+      createDatePicker = flatpickr("#listingDate", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        allowInput: true
+      });
+
+      editDatePicker = flatpickr("#editDate", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        allowInput: true
+      });
+
+      initRoutePickerMap();
+      fetchListings();
+      fetchStats();
+      fetchEarningsHistory();
+      fetchCancellationRequests();
+
+      // Top-level Event Listeners
+      document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editListingId').value;
+        const capVal = document.getElementById('editCapacity').value;
+        const unitVal = document.getElementById('editUnit').value;
+        const capacity = `${capVal} ${unitVal}`;
+        const price = document.getElementById('editPrice').value;
+        const baseCost = document.getElementById('editBaseCost').value;
+        const date = document.getElementById('editDate').value;
+        const location = document.getElementById('editLocation').value;
         const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const res = await fetch(`${API_URL}/listings/my`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const listings = await res.json();
-
-        const listContainer = document.getElementById('listingsContainer');
-
-        if (!listContainer) {
-          console.error("Listings container not found!");
-          return;
+        try {
+          const res = await fetch(`${API_URL}/listings/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ capacity, price_per_unit: price, base_cost: baseCost, location, date, details: { route_full: editRoutePoints } })
+          });
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to update listing');
+          }
+          alert('Successfully updated listing');
+          closeEditModal();
+          fetchListings();
+        } catch (err) {
+          console.error(err);
+          alert('Error updating listing: ' + err.message);
         }
+      });
 
-        // Only show logistics spaces in the Provider dashboard. Custom splits stay in the Consumer portal.
-        const logisticsTypes = ['cargo_split', 'cold_storage', 'warehouse'];
-        const logisticsListings = listings.filter(l => logisticsTypes.includes(l.type));
+      // The legacy aiChatForm listener has been removed to support Guided Chatbot.
 
-        if (logisticsListings.length === 0) {
-          listContainer.innerHTML = '<p class="text-center text-slate-400 py-4">No listings yet.</p>';
-          return;
-        }
+    });
 
-        listContainer.innerHTML = '';
+    function setCapacityUnit(unit, context) {
+      const isKg = unit === 'kg';
+      const kgBtn = document.getElementById(`unit-kg-${context}`);
+      const tonBtn = document.getElementById(`unit-ton-${context}`);
+      const input = document.getElementById(context === 'publish' ? 'listingUnit' : 'editUnit');
 
-        logisticsListings.forEach(listing => {
-          const statusBadge = listing.approved
-            ? '<span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-bold">Active</span>'
-            : '<span class="text-[10px] bg-amber-100 text-amber-600 px-2 py-1 rounded-full font-bold">Pending Approval</span>';
+      input.value = unit;
 
-          const html = `
-                    <div class="flex flex-col p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                        <div class="flex items-center justify-between mb-3">
-                          <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                              <span class="material-icons text-blue-600 dark:text-blue-400">local_shipping</span>
-                            </div>
-                            <div>
-                              <div class="flex items-center gap-2">
-                                  <h4 class="font-semibold text-slate-900 dark:text-white capitalize">${listing.type.replace('_', ' ')}</h4>
-                                  ${statusBadge}
-                              </div>
-                              <p class="text-xs text-slate-500">${listing.location || 'Location N/A'} • ${listing.date || 'Date N/A'}</p>
-                            </div>
-                          </div>
-                          <div class="text-right">
-                            <p class="text-sm font-bold text-green-600 dark:text-green-400">${listing.capacity}</p>
-                            <p class="text-xs text-slate-400">₹${listing.price_per_unit}/unit</p>
-                          </div>
-                        </div>
-                        
-                        <div class="flex justify-end border-t border-slate-200 dark:border-slate-800 pt-3 mt-1 space-x-2">
-                            ${listing.approved ?
-              `<button onclick="openEditModal(${listing.id}, '${listing.capacity}', '${listing.price_per_unit}', '${listing.base_cost}')" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
-                                <span class="material-icons text-[14px]">edit</span> Edit
-                            </button>
-                            <button onclick="openTrackingModal(${listing.id})" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-blue-700 transition-colors bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
-                                <span class="material-icons text-[14px]">add_location</span> Update Tracking
-                            </button>` :
-              '<span class="text-xs text-slate-400 italic">Waiting for approval...</span>'}
-                        </div>
-                    </div>
-                 `;
-          listContainer.insertAdjacentHTML('beforeend', html);
-        });
-
-      } catch (err) {
-        console.error(err);
+      if (isKg) {
+        kgBtn.className = "px-3 py-1 text-[9px] font-black rounded-md transition-all bg-white dark:bg-slate-800 text-primary shadow-sm";
+        tonBtn.className = "px-3 py-1 text-[9px] font-black rounded-md transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200";
+      } else {
+        tonBtn.className = "px-3 py-1 text-[9px] font-black rounded-md transition-all bg-white dark:bg-slate-800 text-primary shadow-sm";
+        kgBtn.className = "px-3 py-1 text-[9px] font-black rounded-md transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200";
       }
     }
 
-    // Fetch Provider Dynamic Stats
+    let earningsChart = null;
+    function renderEarningsChart(graphData) {
+      const ctx = document.getElementById('earningsChart').getContext('2d');
+      if (earningsChart) earningsChart.destroy();
+
+      earningsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: graphData.map(d => d.month),
+          datasets: [{
+            label: 'Earnings',
+            data: graphData.map(d => d.amount),
+            borderColor: '#10b981',
+            backgroundColor: (context) => {
+                const chart = context.chart;
+                const {ctx, chartArea} = chart;
+                if (!chartArea) return null;
+                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
+                return gradient;
+            },
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#10b981',
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1E293B',
+              padding: 10,
+              titleFont: { size: 10, weight: 'bold' },
+              bodyFont: { size: 12, weight: 'black' },
+              callbacks: {
+                label: (context) => ` ₹${context.parsed.y.toFixed(2)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              display: false,
+              beginAtZero: true
+            },
+            x: {
+              grid: { display: false },
+              ticks: { 
+                font: { size: 8, weight: 'bold' },
+                color: '#94A3B8'
+              }
+            }
+          }
+        }
+      });
+    }
+
     async function fetchStats() {
       const token = localStorage.getItem('token');
       if (!token) return;
       try {
-        const res = await fetch('http://localhost:3000/api/stats', {
+        const res = await fetch(`${API_URL}/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (res.ok) {
-          const data = await res.json();
-          document.getElementById('providerAmountEarned').innerText = `$${parseFloat(data.amount_earned).toFixed(2)}`;
-        }
+        if (!res.ok) throw new Error(`Stats HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        document.getElementById('providerAmountEarned').innerText = `₹${parseFloat(data.amount_earned || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } catch (err) {
         console.error("Error fetching stats:", err);
       }
     }
 
-    // Load listings on start
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchListings();
-      fetchStats();
-    });
+    async function fetchListings() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_URL}/listings/my`, { headers: { 'Authorization': `Bearer ${token}` } });
+        globalListings = await res.json();
+        const container = document.getElementById('listingsContainer');
+        container.innerHTML = '';
+        if (globalListings.length === 0) {
+          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm italic">You have no active postings.</div>';
+          return;
+        }
+        globalListings.forEach(l => {
+          const typeLabel = l.type.replace('_', ' ').toUpperCase();
+          const route = l.location || 'Local Spot';
+          const capacityText = l.capacity;
+          const statusColor = l.status === 'approved' ? 'text-green-600' : 'text-amber-500';
+          const icon = l.type === 'cargo_split' ? 'local_shipping' : (l.type === 'cold_storage' ? 'ac_unit' : 'warehouse');
+          const bgColor = l.type === 'cargo_split' ? 'bg-blue-100 dark:bg-blue-900/40' : (l.type === 'cold_storage' ? 'bg-cyan-100 dark:bg-cyan-900/40' : 'bg-emerald-100 dark:bg-emerald-900/40');
+          const iconColor = l.type === 'cargo_split' ? 'text-blue-600' : (l.type === 'cold_storage' ? 'text-cyan-600' : 'text-emerald-600');
+
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 group hover:border-primary/30 transition-all';
+          div.innerHTML = `
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-lg ${bgColor} flex items-center justify-center">
+                <span class="material-icons ${iconColor}">${icon}</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-900 dark:text-white capitalize">${typeLabel}</h4>
+                <p class="text-xs text-slate-500 truncate max-w-[180px]">${route}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 uppercase tracking-tighter">${l.status}</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right flex flex-col items-end gap-2">
+              <p class="text-sm font-bold ${statusColor}">${capacityText}</p>
+              <button onclick='openEditModal(${JSON.stringify(l).replace(/'/g, "&apos;")})' class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-all hover:text-primary">
+                <span class="material-icons text-sm">edit</span>
+              </button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+
+        // Check for edit_listing_id in URL to auto-open modal
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoEditId = urlParams.get('edit_listing_id');
+        if (autoEditId) {
+          const l = globalListings.find(x => x.id == autoEditId);
+          if (l) {
+            setTimeout(() => openEditModal(l), 500);
+            // Clear URL param without reloading
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        }
+      } catch (err) { console.error("Listings error:", err); }
+    }
+
+    async function fetchEarningsHistory() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_URL}/stats/earnings-history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error(`History HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        const history = data.history;
+        const graphData = data.graphData;
+        
+        // Render Chart
+        if (graphData) renderEarningsChart(graphData);
+
+        const container = document.getElementById('earningsHistoryContainer');
+        if (!history || history.length === 0) {
+          container.innerHTML = '<div class="text-center py-4 text-slate-400 text-[10px] italic">No payment history yet</div>';
+          return;
+        }
+
+        container.innerHTML = history.map(h => `
+          <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl mb-2 border border-slate-100 dark:border-slate-800">
+            <div>
+              <p class="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tight">${h.item}</p>
+              <p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">${new Date(h.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] font-black text-emerald-500 tracking-tight">+₹${h.amount.toFixed(2)}</p>
+              <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Earned</p>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Error fetching history:", err);
+      }
+    }
+
+    async function fetchCancellationRequests() {
+      const container = document.getElementById('cancellationRequestsContainer');
+      container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">No pending requests.</div>';
+    }
+
+    function openEditModal(l) {
+      document.getElementById('editModal').classList.remove('hidden');
+      document.getElementById('editModal').classList.add('flex');
+      document.getElementById('editListingId').value = l.id;
+      
+      // Parse capacity: "10 ton" or "5000 kg"
+      const capMatch = l.capacity.match(/^(\d+)\s*(.*)$/);
+      if (capMatch) {
+          document.getElementById('editCapacity').value = capMatch[1];
+          const unit = (capMatch[2] || 'kg').toLowerCase().trim();
+          setCapacityUnit(unit === 'ton' ? 'ton' : 'kg', 'edit');
+      } else {
+          document.getElementById('editCapacity').value = l.capacity;
+          setCapacityUnit('kg', 'edit');
+      }
+
+      document.getElementById('editPrice').value = l.price_per_unit;
+      document.getElementById('editBaseCost').value = l.base_cost || 0;
+
+      if (editDatePicker) {
+        editDatePicker.setDate(l.date ? l.date.split(', ') : "");
+      }
+
+      const isWarehouse = l.type === 'warehouse';
+      document.getElementById('editRouteInputsContainer').classList.toggle('hidden', isWarehouse);
+      document.getElementById('editRouteControls').classList.toggle('hidden', isWarehouse);
+      document.getElementById('editWarehouseContainer').classList.toggle('hidden', !isWarehouse);
+
+      // Load points if available
+      if (l.details && l.details.route_full) {
+        editRoutePoints = JSON.parse(JSON.stringify(l.details.route_full));
+        if (isWarehouse) {
+          document.getElementById('editWarehouseSearch').value = editRoutePoints.start ? editRoutePoints.start.name : '';
+        } else {
+          document.getElementById('editStartSearch').value = editRoutePoints.start ? editRoutePoints.start.name : '';
+          document.getElementById('editEndSearch').value = editRoutePoints.end ? editRoutePoints.end.name : '';
+          const container = document.getElementById('editStopsInputsContainer');
+          container.innerHTML = '';
+          editRoutePoints.stops.forEach((s, idx) => { if (s) addEditStopInput(idx, s.name); });
+        }
+      } else {
+        editRoutePoints = { start: null, end: null, stops: [] };
+        document.getElementById('editStartSearch').value = '';
+        document.getElementById('editEndSearch').value = '';
+        document.getElementById('editWarehouseSearch').value = '';
+        document.getElementById('editStopsInputsContainer').innerHTML = '';
+      }
+
+      setTimeout(() => {
+        if (!editRouteMap) {
+          editRouteMap = L.map('editRoutePickerMap', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(editRouteMap);
+        }
+        setTimeout(() => {
+          editRouteMap.invalidateSize();
+          syncEditMapUI();
+        }, 500);
+      }, 300);
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editModal').classList.remove('flex');
+    }
+
+    function syncEditMapUI(targetMap = null) {
+      const activeMap = targetMap || editRouteMap;
+      if (!activeMap) return;
+      activeMap.eachLayer(layer => { if (layer instanceof L.Marker || layer instanceof L.Polyline) activeMap.removeLayer(layer); });
+      const pts = [];
+      const labels = [];
+      let charCode = 65;
+      if (editRoutePoints.start) { pts.push(editRoutePoints.start); labels.push(String.fromCharCode(charCode++)); }
+      editRoutePoints.stops.forEach(p => { if (p) { pts.push(p); labels.push(String.fromCharCode(charCode++)); } });
+      if (editRoutePoints.end && (editRoutePoints.end !== editRoutePoints.start || pts.length === 1)) {
+        pts.push(editRoutePoints.end); labels.push(String.fromCharCode(charCode++));
+      } else if (editRoutePoints.end && !editRoutePoints.start) {
+        pts.push(editRoutePoints.end); labels.push(String.fromCharCode(charCode++));
+      }
+
+      const leafletPoints = [];
+      pts.forEach((p, i) => {
+        const colorClass = i === 0 ? 'bg-emerald-500' : (i === pts.length - 1 ? 'bg-red-500' : 'bg-blue-500');
+        L.marker([p.lat, p.lon], { icon: getLabeledIcon(labels[i], colorClass) }).addTo(activeMap);
+        leafletPoints.push([p.lat, p.lon]);
+      });
+
+      if (leafletPoints.length > 1) {
+        L.polyline(leafletPoints, { color: '#2563eb', weight: 4, dashArray: '5, 10' }).addTo(activeMap);
+        activeMap.fitBounds(L.polyline(leafletPoints).getBounds(), { padding: [40, 40] });
+      } else if (leafletPoints.length === 1) {
+        activeMap.setView(leafletPoints[0], 13);
+      }
+      const names = pts.map(p => p.name);
+      document.getElementById('editLocation').value = names.join(" -> ");
+    }
+
+    function toggleAIChat() {
+      const chat = document.getElementById('aiAssistantChat');
+      const isOpen = chat.classList.toggle('hidden');
+      if (!isOpen) { 
+          chat.classList.add('active'); 
+          isAIChatOpen = true; 
+          // Initialize chatbot flow if it's the first time
+          if (document.getElementById('aiMessageArea').children.length === 0) {
+              interactChatbot('main_menu');
+          }
+      } else { 
+          chat.classList.remove('active'); 
+          isAIChatOpen = false; 
+      }
+    }
+
+    function addAIMessage(role, text) {
+      const chatArea = document.getElementById('aiMessageArea');
+      const div = document.createElement('div');
+      div.className = `flex flex-col gap-1 max-w-[80%] animate-in fade-in slide-in-from-bottom-2 ${role === 'user' ? 'self-end ml-auto' : ''}`;
+
+      let msgHtml = '';
+      // Convert basic markdown (like **bold**) to HTML
+      const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+      if (role === 'user') {
+        msgHtml = `<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-none text-sm shadow-sm">${formattedText}</div>
+                   <span class="text-[9px] text-slate-400 mr-1 self-end">You • Just now</span>`;
+      } else {
+        msgHtml = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none text-sm shadow-sm">${formattedText}</div>
+                   <span class="text-[9px] text-slate-400 ml-1">Assistant • Just now</span>`;
+      }
+
+      div.innerHTML = msgHtml;
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function renderChatbotOptions(options) {
+        const optionsArea = document.getElementById('aiOptionsArea');
+        optionsArea.innerHTML = ''; // clear existing
+        
+        if (!options || options.length === 0) return;
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-primary hover:bg-blue-50 dark:hover:bg-slate-800 transition-all shadow-sm";
+            btn.innerText = opt.label;
+            btn.onclick = () => {
+                addAIMessage('user', opt.label);
+                // Temporarily disable buttons until response
+                optionsArea.innerHTML = '<div class="text-center text-xs text-slate-400 py-2 animate-pulse">Thinking...</div>';
+                interactChatbot(opt.next, opt.context);
+            };
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    async function interactChatbot(node_id, context = {}) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                addAIMessage('assistant', "Hello! I am the UNIO AI Assistant. Please log in or sign up above to track your orders, check your trust score, and manage your splits!");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/chatbot/interact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ node_id, context })
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                addAIMessage('assistant', "Your session has expired. Please log in again to continue.");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            if (!res.ok) throw new Error("Failed to fetch next step");
+
+            const data = await res.json();
+            
+            // Allow a tiny delay for natural feel
+            setTimeout(() => {
+                addAIMessage('assistant', data.message);
+                renderChatbotOptions(data.options);
+            }, 400);
+
+            if (node_id === 'close_chat') {
+                setTimeout(() => toggleAIChat(), 1500);
+            }
+        } catch (err) {
+            console.error("Chatbot Error:", err);
+            addAIMessage('assistant', "Sorry, I lost connection to the server. Let's restart.");
+            renderChatbotOptions([{ label: "Restart Chat", next: "main_menu" }]);
+        }
+    }
+
+    function removeEditStopInput(index) {
+      document.getElementById(`editStopRow-${index}`).remove();
+      editRoutePoints.stops[index] = undefined;
+      syncEditMapUI();
+    }
+
+    function clearEditRouteSearch() {
+      editRoutePoints = { start: null, end: null, stops: [] };
+      document.getElementById('editStartSearch').value = '';
+      document.getElementById('editEndSearch').value = '';
+      document.getElementById('editWarehouseSearch').value = '';
+      document.getElementById('editStopsInputsContainer').innerHTML = '';
+      syncEditMapUI();
+    }
+
+
+    async function publishListing() {
+      const type = document.getElementById('listingType').value;
+      const capVal = document.getElementById('listingCapacity').value;
+      const unitVal = document.getElementById('listingUnit').value;
+      const capacity = `${capVal} ${unitVal}`;
+      const price = document.getElementById('listingPrice').value;
+      const location = document.getElementById('listingLocation').value;
+      const date = document.getElementById('listingDate').value;
+      const baseCost = document.getElementById('listingBaseCost').value || 0;
+
+      if (!routePoints.start || !routePoints.end) {
+        alert("Please select a location!");
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      if (!token) { alert("Please login first"); return; }
+      try {
+        const res = await fetch(`${API_URL}/listings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ type, capacity, price_per_unit: price, base_cost: baseCost, location, date, details: { route_full: routePoints } })
+        });
+        if (res.ok) {
+          alert('Listing submitted! It is now pending admin approval.');
+          clearRouteSearch();
+          fetchListings();
+          document.getElementById('publishForm').reset();
+        } else {
+          const err = await res.json();
+          alert('Failed to publish: ' + (err.message || 'Unknown error'));
+        }
+      } catch (err) { console.error(err); alert('Error publishing: ' + err.message); }
+    }
   </script>
+
+  <!-- AI Assistant Floating Button & Chat -->
+  <div class="fixed bottom-8 right-8 z-[120] flex flex-col items-end gap-4">
+    <!-- Chat Window -->
+    <div id="aiAssistantChat"
+      class="hidden flex-col w-[380px] h-[500px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-white/20 dark:border-slate-700/50 overflow-hidden opacity-0">
+      <div class="p-6 bg-primary text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <span class="material-icons text-xl">smart_toy</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">UNIO Assistant</h4>
+            <p class="text-[10px] opacity-80">Online & Ready to Help</p>
+          </div>
+        </div>
+        <button onclick="toggleAIChat()" class="hover:rotate-90 transition-transform">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div id="aiMessageArea" class="flex-1 overflow-y-auto p-6 space-y-4 sidebar-scroll">
+        <!-- Messages will be injected here -->
+      </div>
+
+      <div class="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700">
+        <div id="aiOptionsArea" class="flex flex-col gap-2">
+            <!-- Dynamic option buttons will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button onclick="toggleAIChat()" id="aiToggleBtn"
+      class="w-16 h-16 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group relative">
+      <span class="material-icons text-3xl group-hover:rotate-12 transition-transform">smart_toy</span>
+      <div
+        class="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-900 rounded-full">
+      </div>
+    </button>
+  </div>
+
+  <!-- AI Assistant logic moved to main script block. -->
   <footer
     class="max-w-7xl mx-auto p-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
     <p>© 2026 Unio Universal Splitting. All rights reserved.</p>
@@ -547,54 +1287,7 @@
     </div>
   </div>
 
-  <script>
-    function openTrackingModal(listingId) {
-      document.getElementById('trackingListingId').value = listingId;
-      document.getElementById('trackingLocationName').value = '';
-      document.getElementById('trackingLat').value = '';
-      document.getElementById('trackingLng').value = '';
-      document.getElementById('trackingModal').classList.remove('hidden');
-      document.getElementById('trackingModal').classList.add('flex');
-    }
-
-    function closeTrackingModal() {
-      document.getElementById('trackingModal').classList.add('hidden');
-      document.getElementById('trackingModal').classList.remove('flex');
-    }
-
-    document.getElementById('trackingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const listingId = document.getElementById('trackingListingId').value;
-      const location_name = document.getElementById('trackingLocationName').value;
-      const lat = parseFloat(document.getElementById('trackingLat').value);
-      const lng = parseFloat(document.getElementById('trackingLng').value);
-
-      const token = localStorage.getItem('token');
-
-      try {
-        const res = await fetch(`${API_URL}/tracking/listings/${listingId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ location_name, lat, lng })
-        });
-
-        if (res.ok) {
-          alert("Checkpoint submitted successfully! It is pending Admin review.");
-          closeTrackingModal();
-        } else {
-          const data = await res.json();
-          alert("Failed: " + (data.message || "Unknown error"));
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error submitting checkpoint.");
-      }
-    });
-  </script>
+  <!-- Tracking logic moved to main script block. -->
 
   <!-- Edit Listing Modal -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center">
@@ -610,21 +1303,106 @@
       <form id="editForm" class="space-y-4">
         <input type="hidden" id="editListingId">
 
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacity</label>
-          <input id="editCapacity" type="text" required
-            class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3">
+        <div class="space-y-4">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Route Selection</label>
+
+          <div id="editRouteInputsContainer" class="space-y-3">
+            <!-- Start Search -->
+            <div class="relative autocomplete-container">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-emerald-500 text-[18px]">trip_origin</span>
+                <input id="editStartSearch" type="text" placeholder="Start Location"
+                  class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs py-2.5 focus:ring-primary"
+                  oninput="handleEditSearchInput(this, 'start')">
+              </div>
+              <div id="editStartResults"
+                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+              </div>
+            </div>
+
+            <!-- Stops Container -->
+            <div id="editStopsInputsContainer" class="space-y-3"></div>
+
+            <!-- End Search -->
+            <div class="relative autocomplete-container">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-red-500 text-[18px]">location_on</span>
+                <input id="editEndSearch" type="text" placeholder="End Destination"
+                  class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs py-2.5 focus:ring-primary"
+                  oninput="handleEditSearchInput(this, 'end')">
+              </div>
+              <div id="editEndResults"
+                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+              </div>
+            </div>
+
+            <!-- Single Location (Warehouse) -->
+            <div id="editWarehouseContainer" class="hidden relative autocomplete-container">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-blue-500 text-[18px]">warehouse</span>
+                <input id="editWarehouseSearch" type="text" placeholder="Warehouse Location"
+                  class="flex-1 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs py-2.5 focus:ring-primary"
+                  oninput="handleEditSearchInput(this, 'warehouse')">
+              </div>
+              <div id="editWarehouseResults"
+                class="absolute left-0 right-0 z-[1000] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl mt-1 hidden max-h-40 overflow-y-auto">
+              </div>
+            </div>
+          </div>
+
+          <div id="editRouteControls" class="flex items-center justify-between gap-4 mt-2">
+            <button type="button" onclick="addEditStopInput()"
+              class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 bg-blue-50 text-blue-500 rounded-md">Add
+              Stop</button>
+            <button type="button" onclick="clearEditRouteSearch()"
+              class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 bg-red-50 text-red-500 rounded-md">Clear</button>
+          </div>
+
+          <div class="relative group">
+            <div id="editRoutePickerMap"
+              class="h-40 bg-slate-100 dark:bg-slate-900 rounded-xl w-full z-0 relative border border-slate-200 dark:border-slate-800 overflow-hidden">
+            </div>
+            <button type="button" onclick="toggleMapModal('editRoutePickerMap')"
+              class="absolute top-2 right-2 z-[401] bg-white dark:bg-slate-800 p-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-600 dark:text-slate-300">
+              <span class="material-icons text-xs">fullscreen</span> Expand
+            </button>
+          </div>
+
+          <input id="editLocation" type="hidden" />
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price Per Unit</label>
-          <input id="editPrice" type="number" step="0.01" required
-            class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3">
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capacity</label>
+              <div class="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5 border border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="setCapacityUnit('kg', 'edit')" id="unit-kg-edit" class="px-3 py-1 text-[9px] font-black rounded-md transition-all bg-white dark:bg-slate-800 text-primary shadow-sm">KG</button>
+                <button type="button" onclick="setCapacityUnit('ton', 'edit')" id="unit-ton-edit" class="px-3 py-1 text-[9px] font-black rounded-md transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">TON</button>
+              </div>
+            </div>
+            <input id="editCapacity" type="number" required
+              class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold focus:ring-primary focus:border-primary py-3 px-4">
+            <input type="hidden" id="editUnit" value="kg">
+          </div>
+          <div class="space-y-2">
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Price Per Unit</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+              <input id="editPrice" type="number" step="0.01" required
+                class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold focus:ring-primary focus:border-primary py-3 pl-8">
+            </div>
+          </div>
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Base Cost</label>
           <input id="editBaseCost" type="number" step="0.01" required
+            class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Availability Dates</label>
+          <input id="editDate" type="text" readonly
             class="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-primary focus:border-primary py-3">
         </div>
 
@@ -636,174 +1414,28 @@
     </div>
   </div>
 
-  <script>
-    function openEditModal(listingId, capacity, price, baseCost) {
-      document.getElementById('editListingId').value = listingId;
-      document.getElementById('editCapacity').value = capacity;
-      document.getElementById('editPrice').value = price;
-      document.getElementById('editBaseCost').value = baseCost;
-      document.getElementById('editModal').classList.remove('hidden');
-      document.getElementById('editModal').classList.add('flex');
-    }
+  <!-- Consolidating all logic into the single script block at line 375. -->
+  <!-- Expandable Map Modal -->
+  <div id="mapExpansionModal"
+    class="fixed inset-0 z-[2000] hidden bg-slate-900/90 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl relative">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Expanded Route View</h3>
+        <button onclick="closeMapModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div id="expandedMapContainer" class="h-[70vh] w-full z-0"></div>
+      <div class="p-6 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center">
+        <p class="text-xs text-slate-500 font-medium">Interactive Route Preview (A to Z)</p>
+        <button onclick="closeMapModal()"
+          class="px-6 py-2 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20">Close
+          Preview</button>
+      </div>
+    </div>
+  </div>
 
-    function closeEditModal() {
-      document.getElementById('editModal').classList.add('hidden');
-      document.getElementById('editModal').classList.remove('flex');
-    }
-
-    document.getElementById('editForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const listingId = document.getElementById('editListingId').value;
-      const capacity = document.getElementById('editCapacity').value;
-      const price_per_unit = document.getElementById('editPrice').value;
-      const base_cost = document.getElementById('editBaseCost').value;
-      const token = localStorage.getItem('token');
-
-      try {
-        const res = await fetch(`${API_URL}/listings/${listingId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ capacity, price_per_unit, base_cost })
-        });
-        if (res.ok) {
-          alert('Listing updated!');
-          closeEditModal();
-          fetchListings();
-        } else {
-          alert('Failed to update listing');
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    // Earnings History Fetcher
-    async function fetchEarningsHistory() {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const res = await fetch(`${API_URL}/stats/history`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const history = await res.json();
-        const container = document.getElementById('earningsHistoryContainer');
-
-        if (!container) return;
-
-        if (history.length === 0) {
-          container.innerHTML = '<div class="text-center py-12 text-slate-500 text-sm">No confirmed bookings yet.</div>';
-          return;
-        }
-
-        container.innerHTML = '<div class="space-y-4"></div>';
-        const wrapper = container.querySelector('div');
-
-        history.forEach(item => {
-          const html = `
-            <div class="flex justify-between items-center p-4 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
-                  <span class="material-icons text-emerald-600 dark:text-emerald-400 text-sm">payments</span>
-                </div>
-                <div>
-                  <h4 class="font-bold text-slate-900 dark:text-white text-sm">${item.consumer_name} <span class="text-xs text-slate-500 font-normal">joined</span> <span class="capitalize">${item.listing_type.replace('_', ' ')}</span></h4>
-                  <p class="text-[10px] text-slate-400 mt-0.5">${new Date(item.date).toLocaleDateString()} • ${item.listing_location}</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <span class="font-bold text-emerald-600 dark:text-emerald-400">+$${item.amount}</span>
-                <p class="text-[10px] text-slate-500">Qty: ${item.quantity}</p>
-              </div>
-            </div>
-          `;
-          wrapper.insertAdjacentHTML('beforeend', html);
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Cancellation Management
-    async function fetchCancellationRequests() {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const res = await fetch(`${API_URL}/admin/bookings`, { // Providers can see all their bookings via status stats or we can use a specific route
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        // Actually we need a specific provider route for "requested" cancellations
-        // For now, let's look for them in the bookings if the API supports it.
-        // I'll add a specific endpoint in the backend for this if needed.
-
-        const res2 = await fetch(`${API_URL}/bookings/my-listings-requests`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const requests = await res2.json();
-        const container = document.getElementById('cancellationRequestsContainer');
-        if (!container) return;
-
-        if (requests.length === 0) {
-          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">No pending requests.</div>';
-          return;
-        }
-
-        container.innerHTML = '';
-        requests.forEach(req => {
-          const html = `
-            <div class="p-4 rounded-xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-900/10 space-y-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="font-bold text-sm text-slate-900 dark:text-white">${req.user_name}</h4>
-                  <p class="text-[10px] text-slate-500">${req.type.replace('_', ' ')} • Qty: ${req.quantity}</p>
-                </div>
-                <span class="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">Requested</span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-400 italic">"${req.cancellation_reason || 'No reason provided'}"</p>
-              <div class="flex gap-2 pt-2">
-                <button onclick="handleCancellation('${req.id}', 'approved')" class="flex-1 py-2 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-colors">Approve</button>
-                <button onclick="handleCancellation('${req.id}', 'denied')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-lg hover:bg-slate-300 transition-colors">Deny</button>
-              </div>
-            </div>
-          `;
-          container.insertAdjacentHTML('beforeend', html);
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function handleCancellation(id, status) {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch(`${API_URL}/bookings/${id}/cancel-handle`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ status })
-        });
-        if (res.ok) {
-          alert(`Request ${status}`);
-          fetchCancellationRequests();
-          fetchListings(); // To refresh capacity
-        } else {
-          alert("Failed to handle request");
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Call it when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchEarningsHistory();
-      fetchCancellationRequests();
-    });
-  </script>
 </body>
 
 </html>

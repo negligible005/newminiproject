@@ -54,15 +54,20 @@ router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const providerId = req.user.id;
-        const { capacity, price_per_unit, location, date, base_cost } = req.body;
+        const { capacity, price_per_unit, location, date, base_cost, details } = req.body;
 
         // Verify ownership
-        const listingCheck = await pool.query('SELECT provider_id FROM listings WHERE id = $1', [id]);
+        const listingCheck = await pool.query('SELECT provider_id, details FROM listings WHERE id = $1', [id]);
         if (listingCheck.rows.length === 0) {
             return res.status(404).json({ message: "Listing not found" });
         }
         if (listingCheck.rows[0].provider_id !== providerId) {
             return res.status(403).json({ message: "Not authorized to edit this listing" });
+        }
+
+        let newDetails = listingCheck.rows[0].details || {};
+        if (details) {
+            newDetails = { ...newDetails, ...details };
         }
 
         const updatedListing = await pool.query(
@@ -71,12 +76,39 @@ router.put('/:id', authenticateToken, async (req, res) => {
                  price_per_unit = COALESCE($2, price_per_unit), 
                  location = COALESCE($3, location), 
                  date = COALESCE($4, date), 
-                 base_cost = COALESCE($5, base_cost)
-             WHERE id = $6 RETURNING *`,
-            [capacity, price_per_unit, location, date, base_cost, id]
+                 base_cost = COALESCE($5, base_cost),
+                 details = $6
+             WHERE id = $7 RETURNING *`,
+            [capacity, price_per_unit, location, date, base_cost, JSON.stringify(newDetails), id]
         );
 
         res.json(updatedListing.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Delete a Listing (Provider Only)
+router.delete('/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const providerId = req.user.id;
+
+        // Verify ownership
+        const listingCheck = await pool.query('SELECT provider_id FROM listings WHERE id = $1', [id]);
+        if (listingCheck.rows.length === 0) {
+            return res.status(404).json({ message: "Listing not found" });
+        }
+        if (listingCheck.rows[0].provider_id !== providerId) {
+            return res.status(403).json({ message: "Not authorized to delete this listing" });
+        }
+
+        // Delete associated bookings first to prevent foreign key errors
+        await pool.query('DELETE FROM bookings WHERE listing_id = $1', [id]);
+        await pool.query('DELETE FROM listings WHERE id = $1', [id]);
+
+        res.json({ message: "Listing deleted successfully" });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");

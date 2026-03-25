@@ -389,11 +389,11 @@
                             <p class="text-[11px] text-blue-700 dark:text-blue-300">Free cancellation up to 24h before
                                 start date.</p>
                         </div>
-                        <a href="reservationcon.html"
+                        <button onclick="handlePayment()"
                             class="w-full py-4 bg-primary text-white font-bold rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 rounded-xl">
                             Confirm Reservation
                             <span class="material-symbols-outlined">arrow_forward</span>
-                        </a>
+                        </button>
 
                         <button
                             class="w-full py-3 bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 font-semibold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm">
@@ -425,6 +425,50 @@
         </div>
     </footer>
 
+    <script src="js/payment-system.js"></script>
+    <script>
+        async function handlePayment() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Please login to make a reservation.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="handlePayment()"]');
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+            btn.disabled = true;
+
+            try {
+                // Determine booking/split id (using dummy 2 for now if static)
+                const bookingId = 2; // Real logic should hit API to create booking first
+                
+                // Real dummy payment flow
+                const paymentResult = await PaymentSystem.initiate({
+                    booking_id: bookingId,
+                    amount: 108.70, // Total cost in UI
+                    method: 'UPI_QR'
+                });
+
+                PaymentSystem.showModal({
+                    paymentId: paymentResult.paymentId,
+                    confirmationId: paymentResult.confirmationId,
+                    qrCodeData: paymentResult.qrCodeData,
+                    amount: paymentResult.amount
+                }, (confirmedData) => {
+                    alert('Reservation payment successful! Your confirmation ID is ' + confirmedData.confirmationId);
+                    window.location.href = 'reservationcon.html';
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message || 'Payment failed.');
+            } finally {
+                btn.innerHTML = 'Confirm Reservation <span class="material-symbols-outlined">arrow_forward</span>';
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 
 </html>

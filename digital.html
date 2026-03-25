@@ -276,39 +276,50 @@
         </div>
     </main>
 
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/payment-system.js"></script>
     <script>
-        function handlePayment() {
-            // Mock Razorpay Options
-            var options = {
-                "key": "YOUR_KEY_ID",
-                "amount": "450",
-                "currency": "USD",
-                "name": "Unio Subscription",
-                "description": "Stream UHD Family Slot",
-                "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBZaCpxwFyVpgrfjAaoKdenuP6jouBa91jCGNU6Ra7FbUUppxIhCgqzI6F6EM1F_a_3XF90NKpcI8jyD8yspo5uYc3JsT1z9olRrT9QiQD9tSx7yLgIiFTdv4n9wR7-43ACXtWygrUq_kusoOFIhEvWrQiM-fFfb5MA7a7nsRHiVmCwezhz-i3d1L-upfRKIwqWWM7dhpP4yIDzrR9-B2guOU3ewzbs66BfH9w1gTCDTsIOk_4L6uhO6fZFwhCtPZcUqZpgBYZGtMxz",
-                "handler": function (response) {
-                    window.location.href = 'digitalconfi.html';
-                },
-                "prefill": {
-                    "name": "Alex Johnson",
-                    "email": "alex.johnson@example.com",
-                    "contact": "9000090000"
-                },
-                "theme": {
-                    "color": "#3B82F6"
-                }
-            };
+        async function handlePayment() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Please login to join the group.");
+                window.location.href = 'login.html';
+                return;
+            }
 
-            // Simulating "Processing" then "Success"
             const btn = document.querySelector('button[onclick="handlePayment()"]');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing Payment...';
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                window.location.href = 'digitalconfi.html';
-            }, 2000);
+            try {
+                // Determine group/split id (using dummy 1 for now if static)
+                const splitId = 1; // You'd pass the actual split ID here
+                
+                // Simulating successful booking (normally would call an API like /api/splits/join)
+                
+                // Real dummy payment flow
+                const paymentResult = await PaymentSystem.initiate({
+                    split_id: splitId,
+                    amount: 4.95, // The total monthly calculated above
+                    method: 'UPI_QR'
+                });
+
+                PaymentSystem.showModal({
+                    paymentId: paymentResult.paymentId,
+                    confirmationId: paymentResult.confirmationId,
+                    qrCodeData: paymentResult.qrCodeData,
+                    amount: paymentResult.amount
+                }, (confirmedData) => {
+                    alert('Payment successful! You have joined the group.');
+                    window.location.href = 'digitalconfi.html';
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message || 'Payment failed.');
+            } finally {
+                btn.innerHTML = 'Join Group Now <span class="material-symbols-outlined">chevron_right</span>';
+                btn.disabled = false;
+            }
         }
     </script>
     <p class="text-center text-[11px] text-slate-400">

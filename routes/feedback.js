@@ -61,4 +61,28 @@ router.get('/booking/:bookingId', authenticateToken, async (req, res) => {
     }
 });
 
+// PUBLIC: POST /api/feedback/inquiry - Submit contact form from landing page
+router.post('/inquiry', async (req, res) => {
+    try {
+        const { name, email, subject, message } = req.body;
+        
+        if (!name || !email || !message) {
+            return res.status(400).json({ message: "Name, Email, and Message are required" });
+        }
+
+        const result = await pool.query(
+            'INSERT INTO site_inquiries (name, email, subject, message) VALUES ($1, $2, $3, $4) RETURNING *',
+            [name, email, subject, message]
+        );
+
+        res.status(201).json({ 
+            message: "Your inquiry has been sent successfully. We will get back to you soon!",
+            inquiry: result.rows[0] 
+        });
+    } catch (err) {
+        console.error("Inquiry Error:", err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
 module.exports = router;

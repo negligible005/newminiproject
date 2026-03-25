@@ -5,13 +5,85 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 
 // Helper to parse capacity string (e.g. "500kg" -> { value: 500, unit: "kg" })
 function parseCapacity(capString) {
-    const match = capString.match(/^(\d+)(\s*[a-zA-Z]+)?$/) || capString.match(/^(\d+)/);
+    const match = capString.trim().match(/^([\d.]+)\s*([a-zA-Z]+)?$/);
     if (!match) return { value: 0, unit: '' };
     return {
-        value: parseInt(match[1], 10),
-        unit: match[2] || ''
+        value: parseFloat(match[1]),
+        unit: (match[2] || '').toLowerCase().trim()
     };
 }
+
+// Helper to get conversion factor between units
+function getConversionFactor(fromUnit, toUnit) {
+    const units = {
+        'kg': 1,
+        'ton': 1000,
+        'tons': 1000,
+        'tonne': 1000,
+        'tonnes': 1000,
+        'slots': 1,
+        'unit': 1,
+        'units': 1
+    };
+    
+    const f = units[fromUnit.toLowerCase()] || 1;
+    const t = units[toUnit.toLowerCase()] || 1;
+    
+    return f / t;
+}
+
+// Get all joined activities (Bookings + Split Memberships)
+// MOVED TO TOP to avoid route shadowing (e.g. by /:id)
+router.get('/all-joined', authenticateToken, async (req, res) => {
+    console.log(`[BACKEND] HIT: /api/bookings/all-joined for user ${req.user.id}`);
+    try {
+        const userId = req.user.id;
+
+        // 1. Get standard bookings
+        const bookingsQuery = `
+            SELECT 
+                'booking' as entry_type,
+                b.id, b.status, b.payment_status, b.quantity, b.total_price, 
+                b.cancellation_status, b.created_at,
+                l.type, l.location, l.date,
+                dp.confirmation_id
+            FROM bookings b
+            JOIN listings l ON b.listing_id = l.id
+            LEFT JOIN dummy_payments dp ON dp.booking_id = b.id
+            WHERE b.user_id = $1
+        `;
+
+        // 2. Get marketplace split memberships
+        const splitsQuery = `
+            SELECT 
+                'split' as entry_type,
+                sm.split_id as id, s.status, 
+                (CASE WHEN dp.id IS NOT NULL THEN 'paid' ELSE 'unpaid' END) as payment_status,
+                1 as quantity, s.price_per_person as total_price,
+                NULL as cancellation_status, sm.joined_at as created_at,
+                m.type, 'Marketplace' as location, m.title as date,
+                dp.confirmation_id
+            FROM split_members sm
+            JOIN split_requests s ON sm.split_id = s.id
+            JOIN marketplace_items m ON s.item_id = m.id
+            LEFT JOIN dummy_payments dp ON dp.split_id = s.id AND dp.user_id = sm.user_id
+            WHERE sm.user_id = $1
+        `;
+
+        const bookingsRes = await pool.query(bookingsQuery, [userId]);
+        const splitsRes = await pool.query(splitsQuery, [userId]);
+
+        // Merge and sort
+        const combined = [...bookingsRes.rows, ...splitsRes.rows].sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        res.json(combined);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
 
 // Create Booking (Transactional)
 router.post('/', authenticateToken, async (req, res) => {
@@ -30,22 +102,26 @@ router.post('/', authenticateToken, async (req, res) => {
         }
         const listing = listingRes.rows[0];
 
-        // 2. Check Capacity
-        const currentCap = parseCapacity(listing.capacity);
-        if (currentCap.value < quantity) {
+        // 2. Check Capacity & Handle Conversion
+        const listingCap = parseCapacity(listing.capacity);
+        const consumerUnit = (req.body.unit || 'kg').toLowerCase();
+        
+        const conversionFactor = getConversionFactor(consumerUnit, listingCap.unit);
+        const quantityInListingUnit = quantity * conversionFactor;
+
+        if (listingCap.value < quantityInListingUnit) {
             await client.query('ROLLBACK');
-            return res.status(400).json({ message: "Insufficient capacity" });
+            return res.status(400).json({ message: `Insufficient capacity. Requested ${quantity}${consumerUnit} (${quantityInListingUnit}${listingCap.unit}), but only ${listingCap.value}${listingCap.unit} available.` });
         }
 
         // 3. Deduct Capacity
-        const newCapValue = currentCap.value - quantity;
-        const newCapString = `${newCapValue}${currentCap.unit}`;
+        const newCapValue = listingCap.value - quantityInListingUnit;
+        const newCapString = `${newCapValue.toFixed(2).replace(/\.00$/, '')} ${listingCap.unit}`;
 
-        // If capacity hits 0, maybe mark as inactive? For now just update text.
         await client.query('UPDATE listings SET capacity = $1 WHERE id = $2', [newCapString, listing_id]);
 
-        // 4. Calculate Price
-        const totalPrice = quantity * parseFloat(listing.price_per_unit);
+        // 4. Calculate Price (Price per unit is in listing's unit, e.g. Price per Ton)
+        const totalPrice = quantityInListingUnit * parseFloat(listing.price_per_unit);
 
         // 5. Create Booking
         const newBooking = await client.query(
@@ -54,11 +130,15 @@ router.post('/', authenticateToken, async (req, res) => {
             [userId, listing_id, quantity, totalPrice]
         );
 
+        // 6. Check Payment Required Flag
+        const paymentRequired = listing.details?.payment_enabled !== false;
+
         await client.query('COMMIT'); // Commit Transaction
 
         res.json({
             message: "Booking successful",
             booking: newBooking.rows[0],
+            payment_required: paymentRequired,
             remaining_capacity: newCapString
         });
 
@@ -76,9 +156,10 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
         const bookings = await pool.query(`
-            SELECT b.*, l.type, l.location, l.date, l.provider_id 
+            SELECT b.*, l.type, l.location, l.date, l.provider_id, l.details, dp.confirmation_id 
             FROM bookings b
             JOIN listings l ON b.listing_id = l.id
+            LEFT JOIN dummy_payments dp ON dp.booking_id = b.id
             WHERE b.user_id = $1 
             ORDER BY b.created_at DESC
         `, [userId]);
@@ -196,13 +277,15 @@ router.put('/:id/cancel-handle', authenticateToken, async (req, res) => {
             // Restore capacity
             const listingRes = await client.query('SELECT capacity FROM listings WHERE id = $1 FOR UPDATE', [booking.listing_id]);
             if (listingRes.rows.length > 0) {
-                const match = listingRes.rows[0].capacity.match(/^(\d+)([a-zA-Z]+)?$/);
-                if (match) {
-                    const currentVal = parseInt(match[1]);
-                    const unit = match[2] || '';
-                    const newVal = currentVal + parseInt(booking.quantity);
-                    await client.query('UPDATE listings SET capacity = $1 WHERE id = $2', [`${newVal}${unit}`, booking.listing_id]);
-                }
+                const currentCap = parseCapacity(listingRes.rows[0].capacity);
+                // Convert booking quantity (default KG) to listing unit
+                const consumerUnit = 'kg'; // Default for cancellations
+                const conversionFactor = getConversionFactor(consumerUnit, currentCap.unit);
+                const quantityInListingUnit = parseFloat(booking.quantity) * conversionFactor;
+                
+                const newVal = currentCap.value + quantityInListingUnit;
+                const newCapString = `${newVal.toFixed(2).replace(/\.00$/, '')} ${currentCap.unit}`;
+                await client.query('UPDATE listings SET capacity = $1 WHERE id = $2', [newCapString, booking.listing_id]);
             }
         } else {
             // If denied, maybe reset status to none or keep it as denied

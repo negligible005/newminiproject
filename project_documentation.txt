@@ -1,0 +1,153 @@
+========================================================================
+UNIO - COMPREHENSIVE PROJECT DOCUMENTATION
+========================================================================
+
+1. SYSTEM ARCHITECTURE
+------------------------------------------------------------------------
+Unio is a web-based platform built on a monolithic Client-Server architecture. It bridges resource providers with consumers for shared logistics, storage, digital subscriptions, and custom community splits.
+
+1.1 High-Level Architecture Diagram Flow
+- [Client / Browser] (HTML/Tailwind/Vanilla JS) 
+      <---> HTTP/JSON over REST API 
+      <---> [Web Server] (Node.js + Express.js) 
+      <---> [Database] (PostgreSQL Database)
+
+1.2 Component Breakdown
+(a) Presentation Layer (Frontend)
+- Technology: HTML5, Tailwind CSS, Vanilla JavaScript.
+- Characteristics: Client-side rendering of dynamic data. Pages utilize `fetch()` to call backend REST APIs. JWTs (JSON Web Tokens) are stored in `localStorage` and sent in the Authorization header to maintain session state.
+- Key Views:
+  - Consumer Dashboard (`consumer.html`): View shared resources, manage bookings, join custom splits, view payment history.
+  - Provider Dashboard (`provider.html`): Create and manage listings (cargo, cold storage, warehouse), monitor earnings, view recent activity.
+  - Admin Dashboard (`admin.html`): Oversee the platform, approve/reject listings, monitor system metrics, check booking payment statuses.
+  - Payment Interface (`payment-scan.html`): A simulated mobile payment terminal capturing QR code data and updating the backend transactional status.
+
+(b) Application Logic Layer (Backend)
+- Technology: Node.js, Express.js.
+- Characteristics: Provides RESTful API endpoints. Uses middleware components for JWT verification (`authenticateToken`) and role-based access control (`isAdmin`, `isProvider`).
+- Core Modules:
+  - Auth Server: Handles password hashing (`bcryptjs`) and JWT token emission.
+  - Listing Engine: Manages the lifecycle of resources posted by providers (Pending -> Approved -> Available).
+  - Booking & Split Engine: Coordinates concurrent bookings against listing capacities. Calculates fractional pricing.
+  - Payment Gateway Simulator: Generates dynamic QR codes based on internal network IP, verifies and processes mock transactions using a two-step Confirmation ID system to link desktop requests with mobile approvals.
+
+(c) Data Layer (Database)
+- Technology: PostgreSQL.
+- Characteristics: Relational structure enforcing strict foreign key constraints between users, listings, bookings, and payments. Uses JSONB fields for flexible data attributes (e.g., routing coordinates for logistics).
+
+2. DATABASE DESIGN & SCHEMA (ERD)
+------------------------------------------------------------------------
+The following describes the exact relationships and table schemas. This can be used to generate Entity-Relationship Diagrams.
+
+[Relationships]
+- USER (1) to (Many) LISTINGS (A provider can have multiple listings)
+- USER (1) to (Many) BOOKINGS (A consumer can make multiple bookings)
+- LISTING (1) to (Many) BOOKINGS (A listing can be booked by multiple users until capacity is reached)
+- USER (1) to (Many) CUSTOM_SPLITS (A user can create multiple splits)
+- CUSTOM_SPLIT (1) to (Many) SPLIT_MEMBERS (Many users can join one split)
+- BOOKING (1) to (1) DUMMY_PAYMENT (A booking triggers a payment record)
+- CUSTOM_SPLIT (1) to (Many) DUMMY_PAYMENTS (A split creates payment records for its members)
+
+[Tables & Fields]
+
+TABLE: users
+  - id (Primary Key, Serial)
+  - name (Varchar)
+  - email (Varchar, Unique)
+  - password (Varchar, Bcrypt Hash)
+  - role (Varchar: 'consumer', 'provider', 'admin')
+  - created_at (Timestamp)
+
+TABLE: listings
+  - id (Primary Key, Serial)
+  - provider_id (Foreign Key -> users.id)
+  - type (Varchar: 'cargo_split', 'digital_sub', 'warehouse', etc.)
+  - capacity (Varchar)
+  - price_per_unit (Decimal)
+  - base_cost (Decimal)
+  - location (Varchar)
+  - date (Varchar)
+  - status (Varchar: 'pending', 'approved', 'rejected')
+  - details (JSONB: stores route arrays, coordinates, dynamic metadata)
+  - created_at (Timestamp)
+
+TABLE: bookings
+  - id (Primary Key, Serial)
+  - user_id (Foreign Key -> users.id)
+  - listing_id (Foreign Key -> listings.id)
+  - quantity (Integer)
+  - total_price (Decimal)
+  - status (Varchar: 'pending', 'confirmed', 'cancelled')
+  - cancellation_status (Varchar)
+  - created_at (Timestamp)
+
+TABLE: custom_splits
+  - id (Primary Key, Serial)
+  - creator_id (Foreign Key -> users.id)
+  - category (Varchar)
+  - title (Varchar)
+  - total_cost (Decimal)
+  - total_slots (Integer)
+  - location (Varchar)
+  - status (Varchar: 'open', 'completed')
+  - created_at (Timestamp)
+
+TABLE: split_members
+  - id (Primary Key, Serial)
+  - split_id (Foreign Key -> custom_splits.id)
+  - user_id (Foreign Key -> users.id)
+  - joined_at (Timestamp)
+
+TABLE: dummy_payments
+  - id (Primary Key, Serial)
+  - user_id (Foreign Key -> users.id)
+  - amount (Decimal)
+  - status (Varchar: 'pending', 'completed')
+  - payment_method (Varchar)
+  - confirmation_id (Varchar) - Unique generated string (e.g. PAY-12345)
+  - split_id (Foreign Key -> custom_splits.id, Nullable)
+  - booking_id (Foreign Key -> bookings.id, Nullable)
+  - linked (Boolean)
+  - created_at (Timestamp)
+  - completed_at (Timestamp, Nullable)
+
+
+3. API DESIGN & ROUTING
+------------------------------------------------------------------------
+All protected routes expect an HTTP Header: `Authorization: Bearer <JWT_TOKEN>`.
+
+3.1 Authentication (/api/auth)
+- POST /api/auth/register : Expects {name, email, password, role}. Hashes password, inserts to users table, explicitly returns JWT.
+- POST /api/auth/login : Expects {email, password}. Verifies hash, issues JWT.
+
+3.2 Listings Management (/api/listings)
+- GET /api/listings : Publicly fetches approved listings for the consumer marketplace.
+- GET /api/listings/my : Protected (Provider). Fetches only the listings created by the logged-in provider.
+- POST /api/listings : Protected (Provider). Creates a new listing resource. Status is set to 'pending' for admin review.
+- PUT /api/listings/:id : Protected (Provider). Updates an existing listing resource.
+
+3.3 Bookings Management (/api/bookings)
+- GET /api/bookings : Protected (Consumer). Fetches all bookings made by the logged-in user. Joins with 'dummy_payments' to retrieve 'confirmation_id'.
+- POST /api/bookings : Protected (Consumer). Expects {listing_id, quantity, returnUrl, method}. Creates a booking and automatically generates a pending payment record.
+- POST /api/bookings/:id/cancel-request : Protected (Consumer). Flags a booking for cancellation.
+
+3.4 Custom Splits (/api/splits)
+- GET /api/splits : Protected (Consumer). Retrieves all active collaborative splits.
+- POST /api/splits : Protected (Consumer). Expects split metadata. Initializes a new split room for others to join.
+- POST /api/splits/:id/join : Protected (Consumer). Adds the user to 'split_members' and generates a required payment for their fractional share.
+
+3.5 Payment Gateway Emulator (/api/payments)
+- POST /api/payments/initiate : Initializes a payment intent, generates a network-based IP QR code mapping to `/payment-scan.html`.
+- GET /api/payments/scan/:paymentId/:confirmationId : Endpoint simulating the mobile device scanning the QR code. Validates IDs and marks the payment as "completed" in the DB.
+- POST /api/payments/confirm : Desktop polling/confirmation endpoint to synchronize the UI once the mobile scan is successful.
+- GET /api/payments/user/history : Fetches chronological lists of completed dummy payments for the consumer.
+
+3.6 Analytics & Admin Tools (/api/stats & /api/admin)
+- GET /api/stats : Aggregates financial data. Calculates "amount earned" for providers (Total Revenue - Base Cost) and "amount saved" for consumers.
+- GET /api/stats/history : Fetches chronological revenue events for providers, joining booking and payment data.
+- GET /api/admin/dashboard : Calculates aggregate system counts (Total Users, Active Listings, Money Saved).
+- GET /api/admin/bookings : Compiles a god-view of all bookings and their respective payment tracking IDs.
+- PUT /api/admin/listings/:id/status : Allows Admin to approve or reject pending provider listings.
+
+------------------------------------------------------------------------
+END OF DOCUMENTATION

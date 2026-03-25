@@ -71,37 +71,37 @@
 
         <!-- SERVICES -->
         <div class="relative group">
-          <a class="hover:text-primary transition-colors cursor-pointer">Services</a>
+          <a href="#services" class="nav-link hover:text-primary transition-colors cursor-pointer">Services</a>
 
           <div
-            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
-            <a href="#" class="block py-2 hover:text-primary">Cargo Split</a>
-            <a href="#" class="block py-2 hover:text-primary">Cold Chain</a>
-            <a href="#" class="block py-2 hover:text-primary">Cab Sharing</a>
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800 animate-in fade-in slide-in-from-top-2">
+            <a href="#cargo-split" class="block py-2 hover:text-primary transition-colors">Cargo Split</a>
+            <a href="#cold-chain" class="block py-2 hover:text-primary transition-colors">Cold Chain</a>
+            <a href="#cab-sharing" class="block py-2 hover:text-primary transition-colors">Cab Sharing</a>
           </div>
         </div>
 
         <!-- ABOUT -->
         <div class="relative group">
-          <a class="hover:text-primary transition-colors cursor-pointer">About Us</a>
+          <a href="#about-us" class="nav-link hover:text-primary transition-colors cursor-pointer">About Us</a>
 
           <div
-            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
-            <a href="#" class="block py-2 hover:text-primary">Our Mission</a>
-            <a href="#" class="block py-2 hover:text-primary">Team</a>
-            <a href="#" class="block py-2 hover:text-primary">SDGs</a>
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800 animate-in fade-in slide-in-from-top-2">
+            <a href="#our-mission" class="block py-2 hover:text-primary transition-colors">Our Mission</a>
+            <a href="#team" class="block py-2 hover:text-primary transition-colors">Team</a>
+            <a href="#sdgs" class="block py-2 hover:text-primary transition-colors">SDGs</a>
           </div>
         </div>
 
         <!-- PORTFOLIO -->
         <div class="relative group">
-          <a class="hover:text-primary transition-colors cursor-pointer">Portfolio</a>
+          <a href="#portfolio" class="nav-link hover:text-primary transition-colors cursor-pointer">Portfolio</a>
 
           <div
-            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800">
-            <a href="#" class="block py-2 hover:text-primary">Providers</a>
-            <a href="#" class="block py-2 hover:text-primary">Consumers</a>
-            <a href="#" class="block py-2 hover:text-primary">Case Studies</a>
+            class="absolute hidden group-hover:block bg-white dark:bg-navy-950 shadow-xl rounded-xl mt-3 p-4 w-48 border dark:border-slate-800 animate-in fade-in slide-in-from-top-2">
+            <a href="#providers" class="block py-2 hover:text-primary transition-colors">Providers</a>
+            <a href="#consumers" class="block py-2 hover:text-primary transition-colors">Consumers</a>
+            <a href="#case-studies" class="block py-2 hover:text-primary transition-colors">Case Studies</a>
           </div>
         </div>
 
@@ -113,24 +113,86 @@
           <span class="material-icons text-xl dark:hidden">dark_mode</span>
           <span class="material-icons text-xl hidden dark:block">light_mode</span>
         </button>
-        <a href="login.html" id="loginBtn">
+        <a href="login.html" id="loginBtn" class="hidden sm:block">
           <button
             class="px-6 py-2.5 rounded-full bg-navy-950 dark:bg-white dark:text-navy-950 text-white font-semibold hover:opacity-90 transition-opacity">
             Login / Sign Up
           </button>
         </a>
+        <!-- MOBILE TOGGLE -->
+        <button id="mobileMenuToggle" class="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+          <span class="material-icons">menu</span>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- MOBILE MENU OVERLAY -->
+  <div id="mobileMenu" class="fixed inset-0 z-[150] bg-white dark:bg-navy-950 translate-x-full transition-transform duration-300 md:hidden overflow-y-auto">
+    <div class="p-8 flex flex-col h-full">
+        <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg overflow-hidden">
+                    <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                </div>
+                <span class="text-xl font-bold">UNIO</span>
+            </div>
+            <button id="closeMobileMenu" class="p-2 text-slate-500 hover:text-primary transition-colors">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        
+        <nav class="flex flex-col space-y-8">
+            <div>
+                <a href="#services" class="mobile-nav-link text-2xl font-black mb-4 block hover:text-primary transition-colors">Services</a>
+                <div class="grid grid-cols-1 gap-4 pl-4 border-l-2 border-slate-100 dark:border-slate-800">
+                    <a href="#cargo-split" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Cargo Split</a>
+                    <a href="#cold-chain" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Cold Chain</a>
+                    <a href="#cab-sharing" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Cab Sharing</a>
+                </div>
+            </div>
+
+            <div>
+                <a href="#about-us" class="mobile-nav-link text-2xl font-black mb-4 block hover:text-primary transition-colors">About Us</a>
+                <div class="grid grid-cols-1 gap-4 pl-4 border-l-2 border-slate-100 dark:border-slate-800">
+                    <a href="#our-mission" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Our Mission</a>
+                    <a href="#team" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Team</a>
+                    <a href="#sdgs" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">SDGs</a>
+                </div>
+            </div>
+
+            <div>
+                <a href="#portfolio" class="mobile-nav-link text-2xl font-black mb-4 block hover:text-primary transition-colors">Portfolio</a>
+                <div class="grid grid-cols-1 gap-4 pl-4 border-l-2 border-slate-100 dark:border-slate-800">
+                    <a href="#providers" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Providers</a>
+                    <a href="#consumers" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Consumers</a>
+                    <a href="#case-studies" class="mobile-sub-link text-slate-500 dark:text-slate-400 font-bold hover:text-primary transition-colors">Case Studies</a>
+                </div>
+            </div>
+
+            <a href="login.html" class="mt-8">
+                <button class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20">Login / Sign Up</button>
+            </a>
+        </nav>
+        
+        <p class="mt-auto text-center text-xs text-slate-400 py-8">© 2026 UNIO Technologies</p>
+    </div>
+  </div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const user = JSON.parse(localStorage.getItem('user'));
-      if (user && user.name) {
+      const token = localStorage.getItem('token');
+      const serverSession = localStorage.getItem('server_session_id');
+
+      // If user data exists but session might be stale, we wait for auth.js or clear it
+      // For now, only show user if both user and token exist
+      if (user && user.name && token) {
         const authSection = document.getElementById('authSection');
         const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) loginBtn.remove();
+        if (loginBtn) loginBtn.style.display = 'none'; // Hide instead of remove to handle potential errors
 
         const userDisplay = document.createElement('div');
+        userDisplay.id = 'userDisplay';
         userDisplay.className = 'relative group cursor-pointer';
         userDisplay.innerHTML = `
             <div class="flex items-center gap-3">
@@ -141,6 +203,9 @@
             </div>
             
             <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-navy-950 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div class="p-2 border-b border-slate-100 dark:border-slate-800 mb-1 px-4 py-2">
+                    <p class="text-xs text-slate-500 font-medium truncate">${user.email || ''}</p>
+                </div>
                 <div class="p-2">
                     <button onclick="handleIndexLogout()" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors flex items-center gap-2">
                         <span class="material-icons text-sm">logout</span>
@@ -209,25 +274,25 @@
           <div
             class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
             <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Amount Earned</p>
-            <h4 class="text-3xl font-bold mb-2">₹12,450.00</h4>
+            <h4 id="global-amount-earned" class="text-3xl font-bold mb-2">₹0.00</h4>
             <div class="flex items-center text-emerald-500 text-sm font-semibold">
               <span class="material-icons text-sm mr-1">trending_up</span>
-              +12.5% this month
+              Platform Volume
             </div>
           </div>
           <div
             class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
             <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Amount Saved</p>
-            <h4 class="text-3xl font-bold mb-2">₹3,120.45</h4>
+            <h4 id="global-amount-saved" class="text-3xl font-bold mb-2">₹0.00</h4>
             <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-4">
-              <div class="bg-primary h-full rounded-full w-[65%]"></div>
+              <div class="bg-primary h-full rounded-full w-[100%]"></div>
             </div>
-            <p class="text-xs text-slate-400 mt-2">65% of your monthly goal</p>
+            <p class="text-xs text-slate-400 mt-2">Collective user savings</p>
           </div>
           <div
             class="bg-white dark:bg-navy-950 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
             <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Active Splits</p>
-            <h4 class="text-3xl font-bold mb-2">24</h4>
+            <h4 id="global-active-splits" class="text-3xl font-bold mb-2">0</h4>
             <div class="flex -space-x-2 mt-4">
               <img alt="User avatar" class="w-8 h-8 rounded-full border-2 border-white dark:border-navy-950"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJMjJeqpQxOEsuhddvySChYbeiBcTVz46n8WkJqyPG9ezP6Mwd8-g7qV8azE3H0xIq8YuYRlk76bAhVnfoi8Rq4GvieFR-XcbpmC2TzolBPUjlj5k6QMdpRp6MdlnsvkmxgTQNijWvs2JXLggl0NCnjkZdODnCpLoSM66sZ6P12v9Gux-yqdAcLbvLKMo4227BOP8uGkzzDSy0X64Gm-iX4hpqiBA0tQ9CZ3Hrfs66Iz8Me6PChbXCQr6ZcSsDBxC1vF_N02siVbC9" />
@@ -254,45 +319,661 @@
       </div>
     </section>
 
-    <section class="py-24 px-6 bg-navy-950 text-white relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-1/3 h-full bg-primary/20 blur-[100px] -translate-y-1/2"></div>
-      <div class="max-w-4xl mx-auto text-center relative z-10">
-        <h2 class="text-5xl md:text-6xl font-black mb-8 leading-tight">Ready to split your world?</h2>
-        <p class="text-xl text-slate-300 mb-12">Join thousands of businesses and individuals optimizing their resources
-          through the Unio platform.</p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="login.html" class="w-full sm:w-auto">
-            <button
-              class="w-full px-10 py-5 bg-primary rounded-full font-bold text-lg hover:bg-blue-500 transition-colors shadow-2xl">Get
-              Started Now</button>
-          </a>
-          <a href="contact.html" class="w-full sm:w-auto">
-            <button
-              class="w-full px-10 py-5 border border-white/20 rounded-full font-bold text-lg hover:bg-white/10 transition-colors">Talk
-              to Sales</button>
-          </a>
+    </section>
+
+    <!-- SERVICES SECTIONS -->
+    <section id="services" class="py-24 px-6 bg-white dark:bg-navy-950">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Our Services</h3>
+          <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white">What we do at UNIO</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div id="cargo-split" class="p-8 rounded-3xl bg-slate-50 dark:bg-navy-900/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all">
+            <span class="material-icons text-primary text-4xl mb-6">local_shipping</span>
+            <h4 class="text-xl font-bold mb-4">Cargo Split</h4>
+            <p class="text-slate-500 dark:text-slate-400">Optimize truck capacity by splitting cargo space among multiple senders, reducing costs and carbon footprint.</p>
+          </div>
+          <div id="cold-chain" class="p-8 rounded-3xl bg-slate-50 dark:bg-navy-900/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all">
+            <span class="material-icons text-primary text-4xl mb-6">ac_unit</span>
+            <h4 class="text-xl font-bold mb-4">Cold Chain</h4>
+            <p class="text-slate-500 dark:text-slate-400">Temperature-controlled logistics for sensitive goods, ensure food and medicine safety through shared cold storage splits.</p>
+          </div>
+          <div id="cab-sharing" class="p-8 rounded-3xl bg-slate-50 dark:bg-navy-900/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all">
+            <span class="material-icons text-primary text-4xl mb-6">directions_car</span>
+            <h4 class="text-xl font-bold mb-4">Cab Sharing</h4>
+            <p class="text-slate-500 dark:text-slate-400">Rethink urban mobility by sharing rides within the UNIO community, making transport affordable and efficient.</p>
+          </div>
         </div>
       </div>
     </section>
-  </main>
-  <footer class="bg-white dark:bg-navy-950 border-t border-slate-100 dark:border-slate-800 py-12 px-6">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg overflow-hidden">
-          <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+
+    <!-- ABOUT US SECTIONS -->
+    <section id="about-us" class="py-24 px-6 bg-slate-50 dark:bg-navy-900/30">
+      <div class="max-w-7xl mx-auto">
+        <div id="our-mission" class="mb-24 flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/2">
+                <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Mission</h3>
+                <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white mb-6">Democratizing Global Logistics Through Shared Resources</h2>
+                <p class="text-lg text-slate-500 dark:text-slate-400 mb-8">UNIO is built on the simple idea that underutilized capacity is a waste of both economic and environmental value. We bridge the gap between providers with space and consumers seeking efficiency.</p>
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-primary/10 rounded-xl"><span class="material-icons text-primary">eco</span></div>
+                    <div>
+                        <h5 class="font-bold text-navy-950 dark:text-white">Sustainable Future</h5>
+                        <p class="text-sm text-slate-500">Reducing empty-mile runs by up to 40%.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 rounded-3xl overflow-hidden shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000" alt="Logistics Mission" class="w-full h-full object-cover">
+            </div>
         </div>
-        <span class="text-xl font-extrabold tracking-tight">UNIO</span>
-      </a>
-      <div class="flex space-x-8 text-sm text-slate-500 font-medium">
-        <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-        <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
-        <a class="hover:text-primary transition-colors" href="#">Contact</a>
-        <a class="hover:text-primary transition-colors" href="#">Blog</a>
+
+        <div id="team" class="mb-24">
+            <div class="text-center mb-16">
+                <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Our People</h3>
+                <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white">Meet the UNIO Team</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Member 1 -->
+                <div class="group bg-white dark:bg-navy-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <img src="siju.jpeg" alt="SIJU MS" class="w-24 h-24 rounded-2xl object-cover mb-6 mx-auto bg-slate-100 dark:bg-slate-800">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-navy-950 dark:text-white group-hover:text-primary transition-colors">SIJU MS</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium">Core Member</p>
+                    </div>
+                </div>
+                <!-- Member 2 -->
+                <div class="group bg-white dark:bg-navy-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <img src="nevedh.jpeg" alt="NEVEDH S" class="w-24 h-24 rounded-2xl object-cover mb-6 mx-auto bg-slate-100 dark:bg-slate-800">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-navy-950 dark:text-white group-hover:text-primary transition-colors">NEVEDH S</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium">Core Member</p>
+                    </div>
+                </div>
+                <!-- Member 3 -->
+                <div class="group bg-white dark:bg-navy-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <img src="pournami.jpeg" alt="POURNAMI P" class="w-24 h-24 rounded-2xl object-cover mb-6 mx-auto bg-slate-100 dark:bg-slate-800">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-navy-950 dark:text-white group-hover:text-primary transition-colors">POURNAMI P</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium">Core Member</p>
+                    </div>
+                </div>
+                <!-- Member 4 -->
+                <div class="group bg-white dark:bg-navy-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <img src="rachel.jpeg" alt="RACHEL ELSA" class="w-24 h-24 rounded-2xl object-cover mb-6 mx-auto bg-slate-100 dark:bg-slate-800">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-navy-950 dark:text-white group-hover:text-primary transition-colors">RACHEL ELSA</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium">Core Member</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sdgs" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="p-6 bg-white dark:bg-navy-950 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+                <span class="text-3xl font-black text-primary/30 block mb-2">01</span>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Economic Growth</p>
+            </div>
+            <div class="p-6 bg-white dark:bg-navy-950 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+                <span class="text-3xl font-black text-primary/30 block mb-2">02</span>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Innovation</p>
+            </div>
+            <div class="p-6 bg-white dark:bg-navy-950 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+                <span class="text-3xl font-black text-primary/30 block mb-2">03</span>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Sustainability</p>
+            </div>
+            <div class="p-6 bg-white dark:bg-navy-950 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+                <span class="text-3xl font-black text-primary/30 block mb-2">04</span>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Partnership</p>
+            </div>
+        </div>
       </div>
-      <p class="text-slate-400 text-sm">© 2026 UNIO Technologies. All rights reserved.</p>
+    </section>
+
+    <!-- PORTFOLIO SECTIONS -->
+    <section id="portfolio" class="py-24 px-6 bg-white dark:bg-navy-950 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Portfolio</h3>
+                <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white">Impact across the ecosystem</h2>
+            </div>
+            <div id="providers" class="mb-16">
+                <h4 class="text-2xl font-bold mb-8 flex items-center gap-3"><span class="p-2 bg-blue-50 dark:bg-blue-900/40 rounded-lg text-primary"><span class="material-icons">local_shipping</span></span> For Providers</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="group relative rounded-3xl overflow-hidden aspect-video">
+                        <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Fleet">
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy-950 to-transparent p-8 flex flex-col justify-end">
+                            <h5 class="text-xl font-bold text-white mb-2">Fleet Management</h5>
+                            <p class="text-slate-300 text-sm">Real-time capacity tracking for 500+ active trucks.</p>
+                        </div>
+                    </div>
+                    <div class="group relative rounded-3xl overflow-hidden aspect-video">
+                        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Warehouse">
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy-950 to-transparent p-8 flex flex-col justify-end">
+                            <h5 class="text-xl font-bold text-white mb-2">Smart Warehousing</h5>
+                            <p class="text-slate-300 text-sm">Automated pallet space allocation across 20 cities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="consumers" class="mb-16">
+                <h4 class="text-2xl font-bold mb-8 flex items-center gap-3"><span class="p-2 bg-purple-50 dark:bg-purple-900/40 rounded-lg text-purple-600"><span class="material-icons">shopping_basket</span></span> For Consumers</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 dark:bg-navy-900/50 p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">A</div>
+                            <div>
+                                <h5 class="font-bold">AgriCorp Solutions</h5>
+                                <p class="text-xs text-slate-500">Consumer since 2025</p>
+                            </div>
+                        </div>
+                        <p class="italic text-slate-600 dark:text-slate-400 font-medium">"UNIO reduced our logistics spend by 35% within the first quarter. The cold chain splitting is a lifesaver for our small-batch distribution."</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-navy-900/50 p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">M</div>
+                            <div>
+                                <h5 class="font-bold">MarketBox Retail</h5>
+                                <p class="text-xs text-slate-500">Consumer since 2026</p>
+                            </div>
+                        </div>
+                        <p class="italic text-slate-600 dark:text-slate-400 font-medium">"Dynamic cab sharing for our last-mile delivery team fixed our biggest operational bottleneck. Highly recommended platform!"</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="case-studies">
+                <div class="bg-navy-950 rounded-[48px] p-12 text-white relative overflow-hidden">
+                    <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h3 class="text-4xl font-extrabold mb-6">Case Study: The Mumbai Efficiency Drive</h3>
+                            <p class="text-slate-400 mb-8">How 50 local providers pooled assets to clear a massive logistics backlog during the 2025 monsoon season.</p>
+                            <button class="px-8 py-3 bg-white text-navy-950 rounded-full font-bold hover:bg-slate-100 transition-colors">Read Full Case Study</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-navy-900 p-6 rounded-3xl">
+                                <span class="text-primary text-3xl font-black">40k+</span>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Pallets Moved</p>
+                            </div>
+                            <div class="bg-navy-900 p-6 rounded-3xl text-emerald-500">
+                                <span class="text-3xl font-black">₹2.4Cr</span>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Cost Saved</p>
+                            </div>
+                            <div class="bg-navy-900 p-6 rounded-3xl text-blue-400">
+                                <span class="text-3xl font-black">98%</span>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Success Rate</p>
+                            </div>
+                            <div class="bg-navy-900 p-6 rounded-3xl text-orange-400">
+                                <span class="text-3xl font-black">12t</span>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">CO2 Reduced</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT US SECTION -->
+    <section id="contact" class="py-24 px-6 bg-slate-50 dark:bg-navy-900/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">Contact Us</h3>
+                    <h2 class="text-4xl font-extrabold text-navy-950 dark:text-white mb-6">Get in touch with the UNIO team</h2>
+                    <p class="text-lg text-slate-500 dark:text-slate-400 mb-8">Have questions about our cargo splitting solutions? Our team is here to help you optimize your logistics.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-white dark:bg-navy-950 shadow-sm flex items-center justify-center text-primary border dark:border-slate-800">
+                                <span class="material-icons">email</span>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-navy-950 dark:text-white">Email Us</h5>
+                                <p class="text-slate-500">hello@unio-logistics.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-white dark:bg-navy-950 shadow-sm flex items-center justify-center text-primary border dark:border-slate-800">
+                                <span class="material-icons">location_on</span>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-navy-950 dark:text-white">Visit Our Hub</h5>
+                                <p class="text-slate-500">Innovation Park, Mumbai, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-950 p-8 md:p-12 rounded-[32px] shadow-xl shadow-slate-200/50 dark:shadow-navy-1000/20 border dark:border-slate-800">
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
+                                <input type="text" id="contactName" placeholder="John Doe" class="w-full px-5 py-4 bg-slate-50 dark:bg-navy-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/50 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
+                                <input type="email" id="contactEmail" placeholder="john@example.com" class="w-full px-5 py-4 bg-slate-50 dark:bg-navy-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/50 transition-all outline-none">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-400 uppercase tracking-wider">Subject</label>
+                            <select id="contactSubject" class="w-full px-5 py-4 bg-slate-50 dark:bg-navy-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/50 transition-all outline-none appearance-none">
+                                <option>General Inquiry</option>
+                                <option>Business Partnership</option>
+                                <option>Technical Support</option>
+                                <option>Feedback</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-400 uppercase tracking-wider">Your Message</label>
+                            <textarea id="contactMessage" rows="4" placeholder="How can we help?" class="w-full px-5 py-4 bg-slate-50 dark:bg-navy-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/50 transition-all outline-none resize-none"></textarea>
+                        </div>
+                        <button type="button" id="submitContact" class="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all transform hover:-translate-y-1">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white dark:bg-navy-950 py-20 px-6 border-t dark:border-slate-800">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg overflow-hidden">
+                        <video src="yo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+                    </div>
+                    <span class="text-2xl font-black tracking-tight text-navy-950 dark:text-white">UNIO</span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 leading-relaxed">Pioneering the future of collaborative logistics through smart cargo splitting and resource sharing.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-navy-900 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">facebook</span></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-navy-900 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">alternate_email</span></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-navy-900 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">camera_alt</span></a>
+                </div>
+            </div>
+
+            <div>
+                <h5 class="text-navy-950 dark:text-white font-bold mb-6">Company</h5>
+                <ul class="space-y-4">
+                    <li><a href="#about-us" class="text-slate-500 hover:text-primary transition-colors">About Us</a></li>
+                    <li><a href="#team" class="text-slate-500 hover:text-primary transition-colors">Team</a></li>
+                    <li><a href="#portfolio" class="text-slate-500 hover:text-primary transition-colors">Portfolio</a></li>
+                    <li><a href="#contact" class="text-slate-500 hover:text-primary transition-colors">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-navy-950 dark:text-white font-bold mb-6">Services</h5>
+                <ul class="space-y-4">
+                    <li><a href="#cargo-split" class="text-slate-500 hover:text-primary transition-colors">Cargo Split</a></li>
+                    <li><a href="#cold-chain" class="text-slate-500 hover:text-primary transition-colors">Cold Chain</a></li>
+                    <li><a href="#cab-sharing" class="text-slate-500 hover:text-primary transition-colors">Cab Sharing</a></li>
+                    <li><a href="marketplace.html" class="text-slate-500 hover:text-primary transition-colors">Marketplace</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-navy-950 dark:text-white font-bold mb-6">Support</h5>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-slate-500 hover:text-primary transition-colors">Help Center</a></li>
+                    <li><a href="#" class="text-slate-500 hover:text-primary transition-colors">Safety Center</a></li>
+                    <li><a href="#" class="text-slate-500 hover:text-primary transition-colors">Terms of Service</a></li>
+                    <li><a href="#" class="text-slate-500 hover:text-primary transition-colors">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-8 border-t dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-sm text-slate-400">© 2026 UNIO Technologies. All rights reserved.</p>
+            <div class="flex items-center gap-8">
+                <a href="#" class="text-sm text-slate-400 hover:text-primary transition-colors">Security</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-primary transition-colors">Cookies</a>
+            </div>
+        </div>
     </div>
   </footer>
 
+  <!-- BACK TO TOP BUTTON -->
+  <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-primary text-white rounded-full shadow-lg shadow-primary/20 flex items-center justify-center opacity-0 translate-y-10 transition-all z-40">
+    <span class="material-icons">arrow_upward</span>
+  </button>
+
+
+
+  <div class="fixed bottom-24 right-8 z-[120] flex flex-col items-end gap-4">
+    <!-- Chat Window -->
+    <div id="aiAssistantChat"
+      class="hidden flex-col w-[380px] h-[500px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-white/20 dark:border-slate-700/50 overflow-hidden opacity-0">
+      <div class="p-6 bg-primary text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <span class="material-icons">smart_toy</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">UNIO Assistant</h4>
+            <p class="text-[10px] opacity-80">Online & Ready to Help</p>
+          </div>
+        </div>
+        <button onclick="toggleAIChat()" class="hover:rotate-90 transition-transform">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div id="aiMessageArea" class="flex-1 overflow-y-auto p-6 space-y-4 sidebar-scroll text-slate-900 dark:text-white">
+        <!-- Messages will be injected here -->
+      </div>
+
+      <div class="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700">
+        <div id="aiOptionsArea" class="flex flex-col gap-2">
+            <!-- Dynamic option buttons will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button onclick="toggleAIChat()" id="aiToggleBtn"
+      class="w-16 h-16 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group relative">
+      <span class="material-icons text-3xl group-hover:rotate-12 transition-transform">smart_toy</span>
+      <div
+        class="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-900 rounded-full">
+      </div>
+    </button>
+  </div>
+
+  <script>
+    // --- AI Assistant Logic ---
+    let isAIChatOpen = false;
+
+    function toggleAIChat() {
+        const chat = document.getElementById('aiAssistantChat');
+        const isOpen = chat.classList.toggle('hidden');
+        if (!isOpen) { 
+            chat.classList.add('active'); 
+            chat.style.opacity = '1';
+            isAIChatOpen = true; 
+            if (document.getElementById('aiMessageArea').children.length === 0) {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    addAIMessage('assistant', "Hello! I am the UNIO AI Assistant. Please log in or sign up above to track your orders, check your trust score, and manage your splits!");
+                    renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                } else {
+                    interactChatbot('main_menu');
+                }
+            }
+        } else { 
+            chat.classList.remove('active'); 
+            chat.style.opacity = '0';
+            isAIChatOpen = false; 
+        }
+    }
+
+    function addAIMessage(role, text) {
+        const chatArea = document.getElementById('aiMessageArea');
+        const div = document.createElement('div');
+        div.className = `flex flex-col gap-1 max-w-[80%] animate-in fade-in slide-in-from-bottom-2 ${role === 'user' ? 'self-end ml-auto' : ''}`;
+
+        let msgHtml = '';
+        const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+        if (role === 'user') {
+            msgHtml = `<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-none text-sm shadow-sm">${formattedText}</div>
+                       <span class="text-[9px] text-slate-400 mr-1 self-end">You • Just now</span>`;
+        } else {
+            msgHtml = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none text-sm shadow-sm">${formattedText}</div>
+                       <span class="text-[9px] text-slate-400 ml-1">Assistant • Just now</span>`;
+        }
+
+        div.innerHTML = msgHtml;
+        chatArea.appendChild(div);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function renderChatbotOptions(options) {
+        const optionsArea = document.getElementById('aiOptionsArea');
+        optionsArea.innerHTML = '';
+        
+        if (!options || options.length === 0) return;
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-primary hover:bg-blue-50 dark:hover:bg-slate-800 transition-all shadow-sm";
+            btn.innerText = opt.label;
+            btn.onclick = () => {
+                addAIMessage('user', opt.label);
+                optionsArea.innerHTML = '<div class="text-center text-xs text-slate-400 py-2 animate-pulse">Thinking...</div>';
+                if (opt.next === 'close_chat') {
+                    toggleAIChat();
+                    optionsArea.innerHTML = '';
+                } else {
+                    interactChatbot(opt.next, opt.context);
+                }
+            };
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    async function interactChatbot(node_id, context = {}) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                addAIMessage('assistant', "Hello! I am the UNIO AI Assistant. Please log in or sign up above to track your orders, check your trust score, and manage your splits!");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            const res = await fetch(`/api/chatbot/interact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ node_id, context })
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                addAIMessage('assistant', "Your session has expired. Please log in again to continue.");
+                renderChatbotOptions([{label: "Got it!", next:"close_chat"}]);
+                return;
+            }
+
+            if (!res.ok) throw new Error("Failed to fetch next step");
+
+            const data = await res.json();
+            
+            setTimeout(() => {
+                addAIMessage('assistant', data.message);
+                renderChatbotOptions(data.options);
+            }, 400);
+
+            if (node_id === 'close_chat') {
+                setTimeout(() => toggleAIChat(), 1500);
+            }
+        } catch (err) {
+            console.error("Chatbot Error:", err);
+            addAIMessage('assistant', "Sorry, I lost connection to the server. Let's restart.");
+            renderChatbotOptions([{ label: "Restart Chat", next: "main_menu" }]);
+        }
+    }
+
+    // --- SMOOTH SCROLL LOGIC ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('a[href^="#"]');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetId = link.getAttribute('href');
+                if (targetId === '#') return;
+                
+                e.preventDefault();
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    const offset = 80; // Header height
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+
+                    // Update Active State
+                    document.querySelectorAll('.nav-link').forEach(nl => nl.classList.remove('text-primary'));
+                    const parentNavLink = link.closest('.group')?.querySelector('.nav-link');
+                    if (parentNavLink) {
+                        parentNavLink.classList.add('text-primary');
+                    } else if (link.classList.contains('nav-link')) {
+                        link.classList.add('text-primary');
+                    }
+                }
+            });
+        });
+
+        // Intersection Observer for Active State on Scroll
+        const observerOptions = {
+            root: null,
+            rootMargin: '-80px 0px -70% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    document.querySelectorAll('.nav-link').forEach(nl => {
+                        const href = nl.getAttribute('href');
+                        if (href === `#${id}`) {
+                           nl.classList.add('text-primary');
+                        } else {
+                           // Keep active if a sub-item is intersecting
+                           const dropdownItems = nl.closest('.group')?.querySelectorAll(`a[href="#${id}"]`);
+                           if (dropdownItems && dropdownItems.length > 0) {
+                               nl.classList.add('text-primary');
+                           } else {
+                               // Only remove if not part of this group
+                               const isSameGroup = nl.closest('.group')?.contains(document.querySelector(`a[href="#${id}"]`));
+                               if (!isSameGroup) nl.classList.remove('text-primary');
+                           }
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- MOBILE MENU LOGIC ---
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-link, .mobile-sub-link');
+
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('translate-x-full');
+            document.body.classList.toggle('overflow-hidden');
+        }
+
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        closeMobileMenu.addEventListener('click', toggleMobileMenu);
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetId = link.getAttribute('href');
+                if (targetId.startsWith('#')) {
+                    toggleMobileMenu(); // Close menu after clicking a section link
+                }
+            });
+        });
+
+        // --- BACK TO TOP LOGIC ---
+        const btt = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                btt.classList.replace('opacity-0', 'opacity-100');
+                btt.classList.replace('translate-y-10', 'translate-y-0');
+            } else {
+                btt.classList.replace('opacity-100', 'opacity-0');
+                btt.classList.replace('translate-y-0', 'translate-y-10');
+            }
+        });
+        btt.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- CONTACT FORM SUBMISSION ---
+        const submitContact = document.getElementById('submitContact');
+        if (submitContact) {
+            submitContact.addEventListener('click', async () => {
+                const name = document.getElementById('contactName').value;
+                const email = document.getElementById('contactEmail').value;
+                const subject = document.getElementById('contactSubject').value;
+                const message = document.getElementById('contactMessage').value;
+
+                if (!name || !email || !message) {
+                    alert('Please fill out all required fields.');
+                    return;
+                }
+
+                submitContact.disabled = true;
+                submitContact.innerText = 'Sending...';
+
+                try {
+                    const res = await fetch('/api/feedback/inquiry', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, subject, message })
+                    });
+
+                    const data = await res.json();
+                    if (res.ok) {
+                        alert(data.message);
+                        // Reset form
+                        document.getElementById('contactName').value = '';
+                        document.getElementById('contactEmail').value = '';
+                        document.getElementById('contactMessage').value = '';
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                } catch (err) {
+                    console.error('Submission error:', err);
+                    alert('Failed to send inquiry. Please try again later.');
+                } finally {
+                    submitContact.disabled = false;
+                    submitContact.innerText = 'Send Message';
+                }
+            });
+        }
+
+        // --- GLOBAL STATS FETCHING ---
+        async function fetchGlobalStats() {
+            try {
+                const res = await fetch('/api/stats/global');
+                const data = await res.json();
+                
+                if (res.ok) {
+                    const earnedEl = document.getElementById('global-amount-earned');
+                    const savedEl = document.getElementById('global-amount-saved');
+                    const splitsEl = document.getElementById('global-active-splits');
+
+                    if (earnedEl) earnedEl.innerText = `₹${data.amount_earned.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                    if (savedEl) savedEl.innerText = `₹${data.amount_saved.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                    if (splitsEl) splitsEl.innerText = data.active_splits;
+                }
+            } catch (err) {
+                console.error('Failed to fetch global stats:', err);
+            }
+        }
+
+        fetchGlobalStats();
+    });
+  </script>
 </body>
+
 
 </html>
